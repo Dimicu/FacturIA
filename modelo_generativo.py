@@ -102,7 +102,7 @@ class ModeloGPT(ModeloGenerativo):
         }
         response = requests.post(self.url, headers=self.headers, json=payload)
         if response.status_code == 200:
-            nombre = response.json()["id"]
+            nombre = response.json()["created"]
             print(response.json())
             with open(f"{nombre}.json", "w", encoding="utf-8") as archivo_json:
                 json.dump(response.json()["choices"][0]["message"]["content"].strip(), archivo_json, ensure_ascii=False, indent=4)
