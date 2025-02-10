@@ -1,0 +1,48 @@
+{
+    "empresa": {
+        "nombre": "TARTAS, S.L.U.",
+        "direccion": "Luarca, 15",
+        "localidad": "Padron",
+        "provincia": "PONTEVEDRA",
+        "telefono": "986349876"
+    },
+    "cliente": {
+        "nombre": "COSTAS PAREDES, María Luisa",
+        "direccion": "Carreiron 4",
+        "codigo_postal": "36234",
+        "localidad": "Moaña",
+        "provincia": "PONTEVEDRA",
+        "dni": "67876965K"
+    },
+    "factura": {
+        "numero": "001-2-02/32",
+        "fecha": "01/02/2025",
+        "albaran": "001/0-668",
+        "base_imponible": "96,00€",
+        "total_impuestos": "20,16€",
+        "total_factura": "116,16€"
+    },
+    "productos": [
+        {
+            "codigo": "99002",
+            "descripcion": "Tarta de Melocotón",
+            "cajas": "1,00",
+            "unidades": "36,00",
+            "precio_unitario": "36,00€",
+            "importe": "36,00€",
+            "iva": "21%",
+            "importe_iva": "62,23€"
+        },
+        {
+            "codigo": "99001",
+            "descripcion": "Tarta de Pera",
+            "cajas": "2,00",
+            "unidades": "30,00",
+            "precio_unitario": "30,00€",
+            "importe": "60,00€",
+            "iva": "21%",
+            "importe_iva": "51,86€"
+        }
+    ],
+    "reglamento": "UE 2016/679, Reglamento General de Protección de Datos"
+}
