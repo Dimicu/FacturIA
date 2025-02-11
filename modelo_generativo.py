@@ -89,7 +89,7 @@ class ModeloGPT(ModeloGenerativo):
 
     def generar_json(self, prompt, role="Eres un asistente de IA que ayuda a generar textos.",modelo="gpt-3.5-turbo", max_tokens=1500):
 
-        carpeta = f"H:\\IA\\ejercicios\\project\\FacturIA\\jsons_generados"
+        carpeta = f"jsons_generados"
        
         messages = [
             {"role": "system", "content": role},
