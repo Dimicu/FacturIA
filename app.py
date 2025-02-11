@@ -7,16 +7,19 @@ from database import BaseDatos
 from modelo_generativo import ModeloGPT
 
 # Configurar la ruta de Tesseract (solo si es necesario)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 def main():
+
+    # (fotografía o dropping files de la factura)
+
     # Cargar la imagen de la factura
-    archivo = "factura_ejemplo5.webp"
-    ruta = f"C:\\Users\\Diego\\PycharmProjects\\FacturIA\\{archivo}" #Poner la ruta adecuada
+    ruta = f"H:\\IA\ejercicios\\project\\FacturIA\\ejemplos_Facturas\\factura_ejemplo5.webp" #Poner la ruta adecuada
+
 
     imagen = Image.open(ruta)
 
     # Extraer texto con Tesseract y configuraciones adicionales
-    texto_extraido = pytesseract.image_to_string(imagen, lang='spa')
+    texto_extraido = pytesseract.image_to_string(imagen)
 
     # Crear un diccionario con los datos
     datos_factura = {
@@ -29,12 +32,14 @@ def main():
 
     #Cargar los datos de api key privada
     load_dotenv()
-    openai_api_key = os.getenv("OPENAI_API_KEY")
+    openai_api_key = os.getenv("API_KEY")
 
     db = BaseDatos()
     modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key,db)
 
-    with open("ejemplo_factura.json", "r", encoding="utf-8") as archivo_json:
+    ruta_json_ejemplo = "H:\\IA\\ejercicios\\project\\FacturIA\\jsons_plantilla_modelo\\ejemplo_factura.json"
+
+    with open(ruta_json_ejemplo, "r", encoding="utf-8") as archivo_json:
         ejemplo_datos = json.load(archivo_json)
     contexto= (  "Estás ayudando a organizar información extraída de una factura, haciendo que sea fácilmente interpretable y procesable en formato JSON."
                  "Por favor, organiza la información extraída de una factura en un formato JSON estructurado."

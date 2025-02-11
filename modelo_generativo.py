@@ -1,5 +1,5 @@
 import json
-
+import os
 import requests
 from pyexpat.errors import messages
 
@@ -89,7 +89,8 @@ class ModeloGPT(ModeloGenerativo):
 
     def generar_json(self, prompt, role="Eres un asistente de IA que ayuda a generar textos.",modelo="gpt-3.5-turbo", max_tokens=1500):
 
-
+        carpeta = f"H:\\IA\\ejercicios\\project\\FacturIA\\jsons_generados"
+       
         messages = [
             {"role": "system", "content": role},
             {"role": "user", "content": prompt},
@@ -103,8 +104,13 @@ class ModeloGPT(ModeloGenerativo):
         response = requests.post(self.url, headers=self.headers, json=payload)
         if response.status_code == 200:
             nombre = response.json()["created"]
-            print(response.json())
-            with open(f"{nombre}.json", "w", encoding="utf-8") as archivo_json:
+            
+            ruta_archivo = os.path.join(carpeta, f"{nombre}.json")
+            if not os.path.exists(carpeta):
+             os.makedirs(carpeta)
+             print("has creado el json")
+             
+            with open(ruta_archivo, "w", encoding="utf-8") as archivo_json:
                 json.dump(response.json()["choices"][0]["message"]["content"].strip(), archivo_json, ensure_ascii=False, indent=4)
 
         else:
