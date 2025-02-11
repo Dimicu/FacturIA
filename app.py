@@ -13,7 +13,7 @@ def main():
     # (fotografía o dropping files de la factura)
 
     # Cargar la imagen de la factura
-    ruta = f"H:\\IA\ejercicios\\project\\FacturIA\\ejemplos_Facturas\\factura_ejemplo5.webp" #Poner la ruta adecuada
+    ruta = f"ejemplos_Facturas/factura_ejemplo5.webp" #Poner la ruta adecuada
 
 
     imagen = Image.open(ruta)
@@ -37,7 +37,7 @@ def main():
     db = BaseDatos()
     modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key,db)
 
-    ruta_json_ejemplo = "H:\\IA\\ejercicios\\project\\FacturIA\\jsons_plantilla_modelo\\ejemplo_factura.json"
+    ruta_json_ejemplo = "jsons_plantilla_modelo/ejemplo_factura.json"
 
     with open(ruta_json_ejemplo, "r", encoding="utf-8") as archivo_json:
         ejemplo_datos = json.load(archivo_json)
