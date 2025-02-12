@@ -1,0 +1,51 @@
+{
+  "empresa": {
+    "nombre": "Home & Cook Vigo",
+    "direccion": "Centro Cial. Vialia Estación de Vigo, Local 21 - Planta baja, Plaza de la estación 1 - V, 36201 Vigo",
+    "cif": "A-20025868",
+    "telefono": "986 44 35 45",
+    "email": "hcvigo@groupeseb.com"
+  },
+  "factura": {
+    "numero": "22193",
+    "fecha": "12/12/2024",
+    "hora": "17:57",
+    "tipo": "Factura simplificada",
+    "vendedor": "3441641"
+  },
+  "productos": [
+    {
+      "descripcion": "Afilador de cuchillos ICE",
+      "cantidad": 1,
+      "precio_unitario": 12.00,
+      "descuento": 0.00,
+      "total": 12.00
+    },
+    {
+      "descripcion": "Masterseal, Hermético",
+      "cantidad": 2,
+      "precio_unitario": 6.00,
+      "descuento": -6.00,
+      "total": 6.00
+    },
+    {
+      "descripcion": "Bolsa plástico mediana",
+      "cantidad": 1,
+      "precio_unitario": 0.10,
+      "descuento": 0.00,
+      "total": 0.10
+    }
+  ],
+  "totales": {
+    "subtotal": 19.92,
+    "iva": {
+      "tipo": "21%",
+      "importe": 4.18
+    },
+    "total": 24.10
+  },
+  "pago": {
+    "metodo": "Mastercard",
+    "importe": 24.10
+  }
+}
