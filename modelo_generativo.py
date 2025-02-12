@@ -36,11 +36,10 @@ class ModeloGenerativo:
 
     def limpiar_prompt(self, prompt):
         prompt = prompt.strip()
-        prompt = prompt.capitalize()
         return prompt
 
 class ModeloGPT(ModeloGenerativo):
-    def __init__(self, nombre, version, api_key, db: BaseDatos):
+    def __init__(self, nombre, version, api_key):
 
         super().__init__(nombre, version)
         self.api_key = api_key
@@ -49,7 +48,7 @@ class ModeloGPT(ModeloGenerativo):
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-        self.db = db
+
 #Nose usa demomento , queda de ejemplo
     def generar_texto(self, prompt,modelo="gpt-3.5-turbo", max_tokens=50):
         messages = [

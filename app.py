@@ -42,8 +42,8 @@ def main():
     load_dotenv()
     openai_api_key = os.getenv("OPENAI_API_KEY")
 
-    db = BaseDatos()
-    modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key, db)
+
+    modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 
     contexto = (
         "Estás ayudando a organizar información extraída de una factura, haciendo que sea fácilmente interpretable y procesable en formato JSON."
@@ -53,8 +53,8 @@ def main():
         "Devuelve el resultado como un objeto JSON bien formado. Asegúrate de que el formato sea correcto y válido."
         f"Te paso un ejemplo de otra factura para que tomes contexto de como debes aplicar el formato: {estructurar_datos()}")
 
-
-    prompt = modelo.agregar_contexto(contexto, datos_factura)
+    datos_factura_limpios =modelo.limpiar_prompt(datos_factura)
+    prompt = modelo.agregar_contexto(contexto, datos_factura_limpios)
     modelo.generar_json(prompt)
 
 
