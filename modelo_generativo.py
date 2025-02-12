@@ -1,8 +1,6 @@
 import json
-import os
 import requests
-from pyexpat.errors import messages
-
+import os
 from database import BaseDatos
 
 class ModeloGenerativo:
@@ -40,16 +38,9 @@ class ModeloGenerativo:
         prompt = prompt.capitalize()
         return prompt
 
-    def formatear_prompt(self, plantilla, variables):
-        try:
-            prompt_formateado = plantilla.format(**variables)
-            return prompt_formateado
-        except KeyError as e:
-            print(f"Error: Falta la variable {e} en el diccionario de variables.")
-            return plantilla
-
 class ModeloGPT(ModeloGenerativo):
     def __init__(self, nombre, version, api_key, db: BaseDatos):
+
         super().__init__(nombre, version)
         self.api_key = api_key
         self.url = "https://api.openai.com/v1/chat/completions"
@@ -87,12 +78,12 @@ class ModeloGPT(ModeloGenerativo):
             print(f"Error: {response.status_code} - {response.text}")
             return None
 
-    def generar_json(self, prompt, role="Eres un asistente de IA que ayuda a generar textos.",modelo="gpt-3.5-turbo", max_tokens=1500):
+    def generar_json(self, prompt,modelo="gpt-3.5-turbo", max_tokens=1500):
 
         carpeta = f"jsons_generados"
        
         messages = [
-            {"role": "system", "content": role},
+            {"role": "system", "content": "Actua como experto en facturación"},
             {"role": "user", "content": prompt},
         ]
         payload = {
