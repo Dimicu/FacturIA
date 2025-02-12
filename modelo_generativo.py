@@ -28,8 +28,9 @@ class ModeloGenerativo:
         # Código para cargar el modelo
         pass
 
-    def generar_texto(self, prompt,role="Asistente de IA", modelo="gpt-3.5-turbo", max_tokens=50):
+    def generar_texto(self, prompt, modelo="gpt-3.5-turbo", max_tokens=50):
         pass
+
     def agregar_contexto(self,contexto,prompt):
         return f"{contexto}\n\n{prompt}"
 
@@ -49,14 +50,10 @@ class ModeloGPT(ModeloGenerativo):
             "Content-Type": "application/json"
         }
         self.db = db
-
-    def generar_contexto(self, prompt,contexto):
-        prompt_con_contexto = self.agregar_contexto(prompt,contexto)
-        return prompt_con_contexto
-
-    def generar_texto(self, prompt, role="Eres un asistente de IA que ayuda a generar textos.",modelo="gpt-3.5-turbo", max_tokens=50):
+#Nose usa demomento , queda de ejemplo
+    def generar_texto(self, prompt,modelo="gpt-3.5-turbo", max_tokens=50):
         messages = [
-            {"role": "system", "content": role},
+            {"role": "system", "content": "Actua como experto en facturación"},
             {"role": "user", "content": prompt},
         ]
         payload = {
@@ -65,7 +62,7 @@ class ModeloGPT(ModeloGenerativo):
             "max_tokens": max_tokens,
             "temperature": 0.7
         }
-        import json
+        #Mostrar los datos dela respuesta
         print(json.dumps(payload, indent=5,ensure_ascii=False))
 
 
