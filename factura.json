@@ -1,3 +1,0 @@
-{
-    "texto": "DECLARAXDO\n\nFactura\nFecha de factura: DD/MM/AAAA\nNumero de factura: 2024-0001\n\nFecha de vencimiento: DD/MM/AAAA\n\nTu nombre y apellidos Nombre o razon social de tu cliente\nDireccion: Direccién:\nNIF: CIF:\nCP y ciudad: CP y ciudad:\nEmail: Email:\nDescripcién Unidades Precio Unitario (€) Precio (€)\nProducto 1 2 100 200,00\nProducto 2 4 150 600,00\nProducto 3 id 93 651,00\nBASE IMPONIBLE: 1.451 €\nIVA (Tipo) : 304,71 €\nIRPF (Tipo) : -217,65 €\nTOTAL: €1.538,06\nComentarios:\n\nPago por transferencia: ESXXXXXXXXXXXXXXXXO"
-}

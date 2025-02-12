@@ -13,16 +13,17 @@ def extraer_texto():
 
     # Cargar la imagen de la factura
 
-    ruta3 = f"ejemplos_Facturas/factura_ejemplo3.jpg"  # Poner la ruta adecuada
-    ruta4 = f"ejemplos_Facturas/factura_ejemplo4.jpg"  # Poner la ruta adecuada
+    #ruta3 = f"ejemplos_Facturas/factura_ejemplo3.jpg"  # Poner la ruta adecuada
+    #ruta4 = f"ejemplos_Facturas/factura_ejemplo4.jpg"  # Poner la ruta adecuada
     ruta5 = f"ejemplos_Facturas/factura_ejemplo5.webp"  # Poner la ruta adecuada
-    ruta6 = f"ejemplos_Facturas/factura_ejemplo6.jpeg"  # Poner la ruta adecuada
-    ruta6_2 = f"ejemplos_Facturas/factura_ejemplo6_2.jpeg"  # Poner la ruta adecuada
-    imagen = Image.open(ruta6_2)
+    #ruta6 = f"ejemplos_Facturas/factura_ejemplo6.jpeg"  # Poner la ruta adecuada
+    #ruta6_2 = f"ejemplos_Facturas/factura_ejemplo6_2.jpeg"  # Poner la ruta adecuada
+    imagen = Image.open(ruta5)
 
     # Extraer texto con Tesseract y configuraciones adicionales
     texto_extraido = pytesseract.image_to_string(imagen)
     return texto_extraido
+
 
 
 def estructurar_datos():
