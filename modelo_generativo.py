@@ -1,7 +1,7 @@
 import json
 import requests
 import os
-from database import BaseDatos
+
 
 class ModeloGenerativo:
     def __init__(self, nombre, version):
@@ -48,6 +48,30 @@ class ModeloGPT(ModeloGenerativo):
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
+
+    def contextualizar(self,modelo="gpt-3.5-turbo",max_tokens=1000):
+
+        prompt_usuario = ""
+        prompt_asistente = ""
+
+        with open("factura.txt", "r", encoding="utf-8") as datos_usuario:
+            prompt_usuario = datos_usuario.read()
+        with open("ejemplo_factura2.json", "r", encoding="utf-8") as datos_asistente:
+            prompt_asistente = datos_asistente.read()
+
+        messages = [
+            {"role": "system", "content": "Actua como experto en facturación"},
+            {"role": "user", "content": f"Estructura los datos que te envío en un json {prompt_usuario}"},
+            {"role": "assistant", "content": f"Aqui tienes los datos en un formato json adecuado {prompt_asistente}"},
+        ]
+        payload = {
+            "model": modelo,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": 0.7
+        }
+        response = requests.post(self.url, headers=self.headers, json=payload)
+        print(response)
 
 #Nose usa demomento , queda de ejemplo
     def generar_texto(self, prompt,modelo="gpt-3.5-turbo", max_tokens=50):
