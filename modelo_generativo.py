@@ -2,6 +2,7 @@ import json
 import requests
 import os
 
+from modelo_verificador import VerificadorJSON
 
 class ModeloGenerativo:
     def __init__(self, nombre, version):
@@ -113,16 +114,18 @@ class ModeloGPT(ModeloGenerativo):
             "temperature": 0.7
         }
         response = requests.post(self.url, headers=self.headers, json=payload)
+        formated_response = response.json()["choices"][0]["message"]["content"].strip()
+        print(VerificadorJSON.Validador(formated_response,max_tokens,modelo))
         if response.status_code == 200:
             nombre = response.json()["created"]
-            
+
             ruta_archivo = os.path.join(carpeta, f"{nombre}.json")
             if not os.path.exists(carpeta):
              os.makedirs(carpeta)
              print("has creado el json")
              
             with open(ruta_archivo, "w", encoding="utf-8") as archivo_json:
-                json.dump(response.json()["choices"][0]["message"]["content"].strip(), archivo_json, ensure_ascii=False, indent=4)
+                json.dump(formated_response, archivo_json, ensure_ascii=False, indent=4)
 
         else:
             print(f"Error: {response.status_code} - {response.text}")
