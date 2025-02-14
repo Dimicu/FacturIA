@@ -3,6 +3,8 @@ import pytesseract
 import json
 from dotenv import load_dotenv
 from PIL import Image
+
+
 from modelo_generativo import ModeloGPT
 # Configurar la ruta de Tesseract (solo si es necesario)
 pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
@@ -41,21 +43,23 @@ def main():
     # Cargar los datos de api key privada
     load_dotenv()
     openai_api_key = os.getenv("OPENAI_API_KEY")
-
-
+# Asegúrate de que db esté instanciada correctamente
     modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 
     contexto = (
         "Estás ayudando a organizar información extraída de una factura, haciendo que sea fácilmente interpretable y procesable en formato JSON."
-        "Recibes los datos como un dataframe de la libreria tesseract de python "
-        "Por favor, organiza la información extraída de una factura en un formato JSON estructurado."
+        "Recibes los datos desde una imagen escaneada mediante OCR por la libreria tesseract de python "
+        "Organiza la información extraída de una factura en un formato JSON estructurado."
         "El JSON debe incluir campos como el emisor, destinatario, productos, cantidades, precios, impuestos y totales o sus equivalentes en cada factura especifica. "
         "Devuelve el resultado como un objeto JSON bien formado. Asegúrate de que el formato sea correcto y válido."
-        f"Te paso un ejemplo de otra factura para que tomes contexto de como debes aplicar el formato: {estructurar_datos()}")
+        f"Te paso un ejemplo de otra factura para que tomes contexto de como debes aplicar el formato: {estructurar_datos()}"
+        )
 
     datos_factura_limpios =modelo.limpiar_prompt(datos_factura)
-    prompt = modelo.agregar_contexto(contexto, datos_factura_limpios)
+    datos_factura_mas_ordenes = f"Ahora genera SOLO el JSON, no añadas una respuesta de texto introductoria o final {datos_factura_limpios}"
+    prompt = modelo.agregar_contexto(contexto, datos_factura_mas_ordenes)
     modelo.generar_json(prompt)
+
 
 
 

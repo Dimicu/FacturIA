@@ -1,102 +1,34 @@
+import os
 import json
 import requests
-import os
+from supabase_db import SupabaseDB
 
 
-class ModeloGenerativo:
-    def __init__(self, nombre, version):
-        self._nombre = nombre
-        self._version = version
-
-    @property
-    def nombre(self):
-        return self._nombre
-
-    @nombre.setter
-    def nombre(self, valor):
-        self._nombre = valor
-
-    @property
-    def version(self):
-        return self._version
-
-    @version.setter
-    def version(self, valor):
-        self._version = valor
-
-    def cargar_modelo(self):
-        # Código para cargar el modelo
-        pass
-
-    def generar_texto(self, prompt, modelo="gpt-3.5-turbo", max_tokens=50):
-        pass
-
-    def agregar_contexto(self,contexto,prompt):
-        return f"{contexto}\n\n{prompt}"
-
-    def limpiar_prompt(self, prompt):
-        prompt = prompt.strip()
-        return prompt
-
-class ModeloGPT(ModeloGenerativo):
+class ModeloGPT:
     def __init__(self, nombre, version, api_key):
-
-        super().__init__(nombre, version)
+        self.nombre= nombre
+        self.version = version
         self.api_key = api_key
+
         self.url = "https://api.openai.com/v1/chat/completions"
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
 
-    def contextualizar(self,modelo="gpt-3.5-turbo",max_tokens=1000):
+    def agregar_contexto(self,prompt,contexto):
+        return f"{contexto}\n\n{prompt}"
 
-        prompt_usuario = ""
-        prompt_asistente = ""
+    def limpiar_prompt(self, prompt):
+        prompt = prompt.strip()
+        return prompt
 
-        with open("factura.txt", "r", encoding="utf-8") as datos_usuario:
-            prompt_usuario = datos_usuario.read()
-        with open("ejemplo_factura2.json", "r", encoding="utf-8") as datos_asistente:
-            prompt_asistente = datos_asistente.read()
+    def calcular_coste_peticion(self, prompt_tokens,completion_tokens):
+        input_cost = 0.0005 / 1000
+        output_cost = 0.0015 / 1000
+        total_tokens_cost = round(input_cost + output_cost,6)
+        return total_tokens_cost
 
-        messages = [
-            {"role": "system", "content": "Actua como experto en facturación"},
-            {"role": "user", "content": f"Estructura los datos que te envío en un json {prompt_usuario}"},
-            {"role": "assistant", "content": f"Aqui tienes los datos en un formato json adecuado {prompt_asistente}"},
-        ]
-        payload = {
-            "model": modelo,
-            "messages": messages,
-            "max_tokens": max_tokens,
-            "temperature": 0.7
-        }
-        response = requests.post(self.url, headers=self.headers, json=payload)
-        print(response)
-
-#Nose usa demomento , queda de ejemplo
-    def generar_texto(self, prompt,modelo="gpt-3.5-turbo", max_tokens=50):
-        messages = [
-            {"role": "system", "content": "Actua como experto en facturación"},
-            {"role": "user", "content": prompt},
-        ]
-        payload = {
-            "model": modelo,
-            "messages": messages,
-            "max_tokens": max_tokens,
-            "temperature": 0.7
-        }
-        #Mostrar los datos dela respuesta
-        print(json.dumps(payload, indent=5,ensure_ascii=False))
-
-
-        response = requests.post(self.url, headers=self.headers, json=payload)
-        if response.status_code == 200:
-            texto_generado = response.json()["choices"][0]["message"]["content"].strip()
-            self.db.guardar_interaccion(prompt, texto_generado)
-            return texto_generado
-        else:
-            print(f"Error: {response.status_code} - {response.text}")
-            return None
 
     def generar_json(self, prompt,modelo="gpt-3.5-turbo", max_tokens=1500):
 
@@ -113,16 +45,38 @@ class ModeloGPT(ModeloGenerativo):
             "temperature": 0.7
         }
         response = requests.post(self.url, headers=self.headers, json=payload)
+        print(requests.post(self.url, headers=self.headers, json=payload))
         if response.status_code == 200:
-            nombre = response.json()["created"]
-            
+
+            data = response.json()
+            nombre = data["created"]
+            message_gpt = response.json()["choices"][0]["message"]["content"].strip()
+            input_tokens = response.json()["usage"]["prompt_tokens"]
+            output_tokens = response.json()["usage"]["completion_tokens"]
+            total_tokens = response.json()["usage"]["total_tokens"]
+            cost = self.calcular_coste_peticion(input_tokens, output_tokens)
+
+            print(response.json())
+            #Crear la ruta de archivo
             ruta_archivo = os.path.join(carpeta, f"{nombre}.json")
             if not os.path.exists(carpeta):
-             os.makedirs(carpeta)
-             print("has creado el json")
-             
+                os.makedirs(carpeta)
+
+             # Guardamos los datos en un archivo JSON
             with open(ruta_archivo, "w", encoding="utf-8") as archivo_json:
-                json.dump(response.json()["choices"][0]["message"]["content"].strip(), archivo_json, ensure_ascii=False, indent=4)
+                json.dump(message_gpt, archivo_json, ensure_ascii=False, indent=4)
+            # Leemos el contenido del archivo
+            with open(ruta_archivo, "r" ,encoding="utf-8" ) as factura_json_texto:
+                factura_data = factura_json_texto.read()
+                # Insertar los datos en Supabase
+                db = SupabaseDB()  # Crea una instancia de SupabaseDB
+                db.insertar_datos_coste(modelo,input_tokens,output_tokens, total_tokens, cost)
+                insert_response = db.insertar_factura({"datos_factura": factura_data})
+
+                if insert_response.data:
+                    print("Factura insertada correctamente en la base de datos.")
+                else:
+                    print("Error al insertar la factura en la base de datos:", insert_response.error)
 
         else:
             print(f"Error: {response.status_code} - {response.text}")
