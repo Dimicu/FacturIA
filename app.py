@@ -4,6 +4,7 @@ import json
 from dotenv import load_dotenv
 from PIL import Image
 from modelo_generativo import ModeloGPT
+from openai_conector_costes import OpenaiConnector
 # Configurar la ruta de Tesseract (solo si es necesario)
 pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 
@@ -35,13 +36,14 @@ def estructurar_datos():
     return {json.dumps(ejemplo_datos, ensure_ascii=False, indent=4)}
 
 def main():
+    insert_response = OpenaiConnector.insert_data("users", {"name": "John Doe", "email": "john@example.com"})
+    print("Insert Response:", insert_response)
     #Extrare los datos de la imagen
     datos_factura = extraer_texto()
 
     # Cargar los datos de api key privada
     load_dotenv()
     openai_api_key = os.getenv("OPENAI_API_KEY")
-
 
     modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 

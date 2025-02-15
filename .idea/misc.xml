@@ -3,5 +3,9 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (Practica_IA_2)" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (FacturIA)" project-jdk-type="Python SDK" />
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Practica_IA_2)" project-jdk-type="Python SDK" />
+>>>>>>> c0980fdfc7c1423df3f01b30a44de17d7fe997fc
 </project>
