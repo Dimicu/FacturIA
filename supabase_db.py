@@ -1,3 +1,4 @@
+import json
 import os
 from supabase import create_client, Client
 
@@ -48,3 +49,11 @@ class SupabaseDB:
             "cost": cost
         }
         self.supabase.table("openai_requests").insert(data).execute()
+
+    def traer_datos(self):
+        # Hacemos la consulta a la tabla 'facturas' para obtener el campo 'datos_factura'
+        response = self.supabase.table("facturas").select("datos_factura->emisor->nombre").execute()
+        response2 = self.supabase.table("facturas").select("datos_factura->datos_factura->emisor->nombre").execute()
+
+        print(response)
+        print(response2)
