@@ -1,12 +1,16 @@
 import os
+from dotenv import load_dotenv
 from supabase import create_client, Client
 
 
 class SupabaseDB:
     def __init__(self):
         """Initialize the Supabase client with credentials from environment variables."""
+
+        load_dotenv()
         SUPABASE_URL = os.getenv("SUPABASE_URL")
         SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        print(SUPABASE_URL)
 
         if not SUPABASE_URL or not SERVICE_ROLE_KEY:
             raise ValueError("Missing Supabase URL or Service Role Key in environment variables.")
