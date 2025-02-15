@@ -1,3 +1,4 @@
+import json
 import os
 import bcrypt
 from dotenv import load_dotenv
@@ -51,6 +52,7 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
+
     def registrar_usuario(self, email: str, password: str):
 
         respuesta_si_existe = (
@@ -87,3 +89,12 @@ class SupabaseDB:
         else:
             print("Usuario no registrado, debe registrarse")
             return False
+          
+    def traer_datos(self):
+        # Hacemos la consulta a la tabla 'facturas' para obtener el campo 'datos_factura'
+        response = self.supabase.table("facturas").select("datos_factura->emisor->nombre").execute()
+        response2 = self.supabase.table("facturas").select("datos_factura->datos_factura->emisor->nombre").execute()
+
+        print(response)
+        print(response2)
+
