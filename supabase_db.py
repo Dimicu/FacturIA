@@ -87,3 +87,46 @@ class SupabaseDB:
         else:
             print("Usuario no registrado, debe registrarse")
             return False
+
+    def actualizar_Users(self, email, password, role):
+
+        response_check_email = (
+            self.supabase.table("users").select("email").eq("email", email).execute()
+        )
+
+        if not response_check_email.data:
+            return {"error": "Usuario no encontrado"}
+
+        nueva_contraseña = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
+
+        response_update = (
+            self.supabase.table("users")
+            .update({"password": nueva_contraseña, "role": role})
+            .eq("email", email)
+            .execute()
+        )
+
+        return response_update.data[0]
+
+    def eliminar_users(self, id):
+
+        response_check_id = (
+            self.supabase.table("users").select("id").eq("id", id).execute()
+        )
+
+        if not response_check_id.data:
+
+            return {"error": f"Usuario con ID {id} no encontrado"}
+
+        response_delete = self.supabase.table("users").delete().eq("id", id).execute()
+
+        if response_delete.data:
+
+            deleted_user = response_delete.data[0]
+            return {
+                "message": f"Usuario con ID {deleted_user['id']} eliminado correctamente"
+            }
+        else:
+            return {"error": "No se pudo eliminar el usuario"}
