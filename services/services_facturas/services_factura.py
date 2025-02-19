@@ -21,7 +21,7 @@ modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 app = FastAPI()
 
 
-@app.post("/procesar-factura")
+
 def procesar_factura():
 
     datos_factura = extraer_texto()
@@ -58,3 +58,6 @@ def estructurar_datos():
     with open(ruta_json_ejemplo, "r", encoding="utf-8") as archivo_json:
         ejemplo_datos = json.load(archivo_json)
     return {json.dumps(ejemplo_datos, ensure_ascii=False, indent=4)}
+
+def comparar_estructura():
+    return "a"
