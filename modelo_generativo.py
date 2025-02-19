@@ -73,7 +73,7 @@ class ModeloGPT:
 
                 db.insertar_datos_coste(modelo,input_tokens,output_tokens, total_tokens, cost)
                 insert_response = db.insertar_factura({"datos_factura": factura_data})
-                db.traer_datos()
+
                 if insert_response.data:
                     print("Factura insertada correctamente en la base de datos.")
                 else:

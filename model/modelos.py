@@ -41,7 +41,7 @@ class Factura(BaseModel):
     menciones_especiales: List[str] = []
     factura_rectificada: Optional[str] = None
 
-    class Config:
+    """class Config:
         min_anystr_length = 1
         anystr_strip_whitespace = True
-        use_enum_values = True
+        use_enum_values = True"""
