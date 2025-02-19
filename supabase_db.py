@@ -52,6 +52,7 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
+
     def registrar_usuario(self, email: str, password: str):
 
         respuesta_si_existe = (

@@ -44,7 +44,7 @@ def procesar_factura():
 
 def extraer_texto():
 
-    ruta5 = f"ejemplos_Facturas/factura_ejemplo5.webp"
+    ruta5 = f"ejemplos_facturas/factura_ejemplo5.webp"
     imagen = Image.open(ruta5)
 
     texto_extraido = pytesseract.image_to_string(imagen)
