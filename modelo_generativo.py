@@ -64,20 +64,28 @@ class ModeloGPT:
 
              # Guardamos los datos en un archivo JSON
             with open(ruta_archivo, "w", encoding="utf-8") as archivo_json:
-                json.dump(message_gpt, archivo_json, ensure_ascii=False, indent=4)
+                datos = json.loads(message_gpt)
+                json.dump(datos, archivo_json, ensure_ascii=False, indent=4)
             # Leemos el contenido del archivo
             with open(ruta_archivo, "r" ,encoding="utf-8" ) as factura_json_texto:
                 factura_data = factura_json_texto.read()
+
                 # Insertar los datos en Supabase
                 db = SupabaseDB()  # Crea una instancia de SupabaseDB
+                """print("Tipo de factura_data:", type(factura_data))
+                print("Datos RAW de gpt " + factura_data)"""
+
+                # Convertimos el string JSON a un objeto Python
+                try:
+                    datos_formateados = json.loads(factura_data)  # Convierte el texto JSON a un diccionario
+                    """print("Datos formateados:", datos_formateados)  # Ahora es un diccionario o lista de Python"""
+                except json.JSONDecodeError as e:
+                    """print("Error al decodificar JSON:", e)"""
 
                 db.insertar_datos_coste(modelo,input_tokens,output_tokens, total_tokens, cost)
-                insert_response = db.insertar_factura({"datos_factura": factura_data})
-
-                if insert_response.data:
-                    print("Factura insertada correctamente en la base de datos.")
-                else:
-                    print("Error al insertar la factura en la base de datos:", insert_response.error)
+                db.insertar_factura(datos_formateados)
+                print("Insercion factura correcta")
+                print("Insercion datos costes correctos")
 
         else:
             print(f"Error: {response.status_code} - {response.text}")

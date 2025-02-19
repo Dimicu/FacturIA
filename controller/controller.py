@@ -23,3 +23,7 @@ async def eliminar_usuario_id(id):
 @router.post("/procesar-factura")
 async def procesar_factura():
     services.services_facturas.services_factura.procesar_factura()
+
+@router.get("/instrucciones")
+def instrucciones():
+    services.services_facturas.services_factura.comparar_estructura()

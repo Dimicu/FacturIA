@@ -59,5 +59,59 @@ def estructurar_datos():
         ejemplo_datos = json.load(archivo_json)
     return {json.dumps(ejemplo_datos, ensure_ascii=False, indent=4)}
 
+def leer_archivo_txt(ruta_instrucciones = "jsons_plantilla_modelo/instrucciones.txt"):
+
+    # Ejemplo de ruta
+    # ruta_instrucciones = "jsons_plantilla_modelo/instrucciones.txt"
+
+    with open(ruta_instrucciones,"r",encoding="utf-8") as archivo:
+        instrucciones = archivo.read()
+    return instrucciones
+
 def comparar_estructura():
-    return "a"
+
+    instrucciones = leer_archivo_txt()
+    diccionario_datos_modelo = {
+        "tipo_factura": "completa/simplificada/rectificativa",
+        "numero_factura": "12345",
+        "serie": "A001",
+        "fecha_expedicion": "DD-MM-YYYY",
+        "fecha_operacion": "DD-MM-YYYY",
+        "emisor": {
+            "nombre": "Nombre de la empresa",
+            "NIF_CIF": "A12345678",
+            "domicilio": "Calle Ejemplo 123, Ciudad"
+        },
+        "receptor": {
+            "nombre": "Nombre del cliente",
+            "NIF_CIF": "B98765432",
+            "domicilio": "Avenida Cliente 456, Ciudad"
+        },
+        "items": [
+            {
+                "descripcion": "Producto o servicio",
+                "cantidad": 1,
+                "precio_unitario": 100.0,
+                "tipo_IVA": 21,
+                "cuota_IVA": 21.0
+            },
+            {
+                "descripcion": "Otro producto",
+                "cantidad": 2,
+                "precio_unitario": 50.0,
+                "tipo_IVA": 10,
+                "cuota_IVA": 10.0
+            }
+        ],
+        "totales": {
+            "base_imponible": 200.0,
+            "total_IVA": 31.0,
+            "total_factura": 231.0
+        },
+        "menciones_especiales": "inversión del sujeto pasivo"
+        ,
+        "factura_rectificada": "Factura 54321"
+    }
+    claves = diccionario_datos_modelo.keys()
+
+    return instrucciones

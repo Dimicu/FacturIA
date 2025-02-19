@@ -1,0 +1,58 @@
+
+Eres un experto en análisis de documentos y facturación. A continuación, te proporciono el texto extraído de una factura. Tu tarea es analizar el contenido y extraer los datos clave de manera estructurada.
+
+INSTRUCCIONES:
+1-Identifica el tipo de factura:
+   - Si menciona una corrección o referencia a otra factura, clasifícala como "rectificativa".
+   - Si no incluye los datos del receptor, es una "factura simplificada".
+   - En caso contrario, es una "factura completa".
+
+2-Extrae la siguiente información clave:
+   - Número de factura y, si está presente, la serie.
+   - Fecha de expedición y, si se indica, la fecha de operación.
+
+3-Identifica los datos del emisor:
+   - Nombre o razón social.
+   - NIF o CIF (Número de Identificación Fiscal o Código de Identificación Fiscal).
+   - Domicilio fiscal.
+
+4-Si la factura es completa, extrae también los datos del receptor:
+   - Nombre o razón social.
+   - NIF o CIF.
+   - Domicilio.
+
+5-Analiza la descripción de las operaciones:
+   - Lista de productos o servicios facturados.
+   - Cantidad de cada producto o servicio.
+   - Precio unitario (sin impuestos).
+   - Tipo de IVA aplicado a cada ítem.
+   - Cuota tributaria correspondiente.
+
+6-Calcula y extrae los importes totales:
+   - Base imponible (suma de los importes sin IVA).
+   - Total IVA (suma de todas las cuotas tributarias).
+   - Total factura (suma total con IVA incluido).
+
+7-Identifica menciones especiales si aparecen en la factura:
+   - Operación exenta de IVA (Ejemplo: "exento de IVA" o "artículo 20 LIVA").
+   - Facturación por destinatario (mención de "autofacturación").
+   - Inversión del sujeto pasivo (Ejemplo: "artículo 84.Uno.2º LIVA").
+   - Régimen especial (Ejemplo: agencias de viajes o bienes usados).
+
+8-Si la factura es rectificativa, extrae la referencia a la factura original que está corrigiendo.
+
+IMPORTANTE:
+
+Todos los campos deben aparecer en el JSON, aunque el dato no esté presente en la factura. Si falta, su valor debe ser null.
+Si hay múltiples productos/servicios, agrégales como elementos en la lista items.
+Respecto a las fechas:
+Extrae las fechas tal como aparecen (DD-MM-YYYY o MM-DD-YYYY). Si tienes duda sobre el formato:
+	Si la fecha parece europea (DD-MM-YYYY), asúmela como tal.
+	Si parece estadounidense (MM-DD-YYYY), interpreta el mes y el día según ese formato.
+	Si las fechas de expedición y operación son incoherentes, usa el contexto para determinar el formato correcto.
+	Si no puedes determinar el formato, deja la fecha como null para revisión.
+Para el campo NIF_CIF, asegúrate de extraer el término adecuado según el contexto (NIF o CIF)
+
+FORMATO DE RESPUESTA (JSON):
+Devuelve la información extraída en el siguiente formato estructurado. **Si un dato no está presente en la factura, su valor debe ser null, pero la clave siempre debe aparecer en el JSON.**
+

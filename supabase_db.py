@@ -23,7 +23,7 @@ class SupabaseDB:
 
     def insertar_factura(self, data: dict):
 
-        response = self.supabase.table("facturas").insert(data).execute()
+        response = self.supabase.table("facturas").insert({"datos_factura": data}).execute()
         return response
 
     def actualizar_factura(self, email: str, updates: dict):
