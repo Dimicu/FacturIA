@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from model.modelos import Usuario
-from services.serv import services_user
+from services.services_usuario import services_user
 
 
 router = APIRouter()
