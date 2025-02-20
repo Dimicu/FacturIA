@@ -1,58 +1,106 @@
+Rol:Asume que eres un experto de documentacion de facturación y administración contable
 
-Eres un experto en análisis de documentos y facturación. A continuación, te proporciono el texto extraído de una factura. Tu tarea es analizar el contenido y extraer los datos clave de manera estructurada.
+Tarea: Extrae la información de la siguiente factura y devuélvela en formato JSON con la estructura exacta del ejemplo que se indica.
+Todos los campos clave deben aparecer en el JSON, aunque el dato no esté presente en la factura. Si falta, su valor debe ser null.
 
-INSTRUCCIONES:
-1-Identifica el tipo de factura:
-   - Si menciona una corrección o referencia a otra factura, clasifícala como "rectificativa".
-   - Si no incluye los datos del receptor, es una "factura simplificada".
-   - En caso contrario, es una "factura completa".
+Número de factura y serie
 
-2-Extrae la siguiente información clave:
-   - Número de factura y, si está presente, la serie.
-   - Fecha de expedición y, si se indica, la fecha de operación.
+La numeración debe conservar cualquier letra presente en la factura.
+Si hay una serie, inclúyela en "serie".
+Si no hay serie, el campo "serie" debe estar vacío ("").
+La numeración dentro de cada serie debe ser correlativa.
 
-3-Identifica los datos del emisor:
-   - Nombre o razón social.
-   - NIF o CIF (Número de Identificación Fiscal o Código de Identificación Fiscal).
-   - Domicilio fiscal.
+Fechas obligatorias
 
-4-Si la factura es completa, extrae también los datos del receptor:
-   - Nombre o razón social.
-   - NIF o CIF.
-   - Domicilio.
+"fecha_expedicion": Fecha en la que se emite la factura.
+"fecha_operacion": Fecha en la que se realizan las operaciones facturadas. Si no aparece en el documento, usa la misma que "fecha_expedicion".
 
-5-Analiza la descripción de las operaciones:
-   - Lista de productos o servicios facturados.
-   - Cantidad de cada producto o servicio.
-   - Precio unitario (sin impuestos).
-   - Tipo de IVA aplicado a cada ítem.
-   - Cuota tributaria correspondiente.
+Datos del emisor y receptor
 
-6-Calcula y extrae los importes totales:
-   - Base imponible (suma de los importes sin IVA).
-   - Total IVA (suma de todas las cuotas tributarias).
-   - Total factura (suma total con IVA incluido).
+Nombre completo o razón social.
+Número de Identificación Fiscal (NIF/CIF).
+Domicilio completo.
+El NIF del destinatario es obligatorio en los siguientes casos:
+Entregas intracomunitarias exentas.
+Operaciones donde el destinatario es el sujeto pasivo del IVA.
+Operaciones realizadas dentro del territorio de aplicación del IVA cuando el emisor esté establecido en dicho territorio.
 
-7-Identifica menciones especiales si aparecen en la factura:
-   - Operación exenta de IVA (Ejemplo: "exento de IVA" o "artículo 20 LIVA").
-   - Facturación por destinatario (mención de "autofacturación").
-   - Inversión del sujeto pasivo (Ejemplo: "artículo 84.Uno.2º LIVA").
-   - Régimen especial (Ejemplo: agencias de viajes o bienes usados).
+Detalle de los bienes/servicios facturados
 
-8-Si la factura es rectificativa, extrae la referencia a la factura original que está corrigiendo.
+"items": Lista con cada producto o servicio facturado.
+Cada ítem debe incluir:
+"descripcion" (nombre del producto/servicio).
+"cantidad" (número de unidades).
+"precio_unitario" (sin impuestos).
+"tipo_IVA" (porcentaje aplicado).
+"cuota_IVA" (importe del IVA aplicado).
 
-IMPORTANTE:
+Totales de la factura
 
-Todos los campos deben aparecer en el JSON, aunque el dato no esté presente en la factura. Si falta, su valor debe ser null.
-Si hay múltiples productos/servicios, agrégales como elementos en la lista items.
-Respecto a las fechas:
-Extrae las fechas tal como aparecen (DD-MM-YYYY o MM-DD-YYYY). Si tienes duda sobre el formato:
-	Si la fecha parece europea (DD-MM-YYYY), asúmela como tal.
-	Si parece estadounidense (MM-DD-YYYY), interpreta el mes y el día según ese formato.
-	Si las fechas de expedición y operación son incoherentes, usa el contexto para determinar el formato correcto.
-	Si no puedes determinar el formato, deja la fecha como null para revisión.
-Para el campo NIF_CIF, asegúrate de extraer el término adecuado según el contexto (NIF o CIF)
+"base_imponible": Suma de los importes sin IVA.
+"total_IVA": Suma del IVA aplicado a todos los conceptos.
+"total_factura": Importe final a pagar, con impuestos incluidos.
 
-FORMATO DE RESPUESTA (JSON):
-Devuelve la información extraída en el siguiente formato estructurado. **Si un dato no está presente en la factura, su valor debe ser null, pero la clave siempre debe aparecer en el JSON.**
+Menciones especiales
 
+Solo incluir si la factura menciona alguna de estas situaciones:
+"operación exenta"
+"facturación por destinatario"
+"inversión del sujeto pasivo"
+"Régimen especial de Agencias de viajes"
+"Régimen especial de bienes usados"
+Si no hay ninguna de estas menciones, el campo "menciones_especiales" debe estar vacío ([]).
+Facturas rectificativas
+
+Si es una factura rectificativa, incluir "factura_rectificada" con el número de factura corregida.
+Si no aplica, dejarlo vacío ("").
+
+Ejemplo de salida esperada en formato json
+
+{
+  "tipo_factura": "completa",
+  "numero_factura": "A152002526B",
+  "serie": "2024A",
+  "fecha_expedicion": "09-11-2020",
+  "fecha_operacion": "30-04-2013",
+  "emisor": {
+    "nombre": "RODOSA, S.L.",
+    "NIF_CIF": "B36620193",
+    "domicilio": "AV XOSE MARIA CASTROVIEJO, 29, 36940 CANGAS"
+  },
+  "receptor": {
+    "nombre": "SOLIÑO HERON MANUEL",
+    "NIF_CIF": "432123219F",
+    "domicilio": "Cl FERRADAS, 1, BURELA"
+  },
+  "items": [
+    {
+      "descripcion": "VALVULA RUEDA",
+      "cantidad": 2,
+      "precio_unitario": 1.03,
+      "tipo_IVA": 21,
+      "cuota_IVA": 0.22
+    },
+    {
+      "descripcion": "LAMPARA W5W",
+      "cantidad": 2,
+      "precio_unitario": 2.34,
+      "tipo_IVA": 21,
+      "cuota_IVA": 0.49
+    },
+    {
+      "descripcion": "F185/65R15 88T RD",
+      "cantidad": 2,
+      "precio_unitario": 44.58,
+      "tipo_IVA": 21,
+      "cuota_IVA": 9.36
+    }
+  ],
+  "totales": {
+    "base_imponible": 95.92,
+    "total_IVA": 20.14,
+    "total_factura": 116.06
+  },
+  "menciones_especiales": ["inversión del sujeto pasivo"],
+  "factura_rectificada": ""
+}
