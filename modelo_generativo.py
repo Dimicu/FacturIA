@@ -23,14 +23,23 @@ class ModeloGPT:
         prompt = prompt.strip()
         return prompt
 
-    def calcular_coste_peticion(self, prompt_tokens,completion_tokens):
-        input_cost = 0.0005 / 1000
-        output_cost = 0.0015 / 1000
-        total_tokens_cost = round(input_cost + output_cost,6)
+    def calcular_coste_peticion(self, prompt_tokens,completion_tokens, modelo):
+
+        OPENAI_PRICING = {
+            'gpt-4o': {'input': 0.005 / 1000, 'output': 0.015 / 1000},
+            'gpt-4-turbo': {'input': 0.01 / 1000, 'output': 0.03 / 1000},
+            'gpt-3.5-turbo': {'input': 0.0005 / 1000, 'output': 0.0015 / 1000}
+        }
+        if (modelo in OPENAI_PRICING):
+            input_costs = prompt_tokens * OPENAI_PRICING[modelo]["input"]
+            output_costs = completion_tokens * OPENAI_PRICING[modelo]["output"]
+
+
+        total_tokens_cost = input_costs + output_costs
         return total_tokens_cost
 
 
-    def generar_json(self, prompt,modelo="gpt-3.5-turbo", max_tokens=1500):
+    def generar_json(self, prompt,modelo="gpt-4-turbo", max_tokens=1500):
 
         carpeta = f"jsons_generados"
        
@@ -54,7 +63,7 @@ class ModeloGPT:
             input_tokens = response.json()["usage"]["prompt_tokens"]
             output_tokens = response.json()["usage"]["completion_tokens"]
             total_tokens = response.json()["usage"]["total_tokens"]
-            cost = self.calcular_coste_peticion(input_tokens, output_tokens)
+            cost = self.calcular_coste_peticion(input_tokens, output_tokens,modelo)
 
             print(response.json())
             #Crear la ruta de archivo
