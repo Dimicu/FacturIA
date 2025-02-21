@@ -24,7 +24,11 @@ app = FastAPI()
 
 def procesar_factura():
 
+
     datos_factura = extraer_texto()
+    with open ("jsons_plantilla_modelo/instrucciones.txt", "r") as instrucciones:
+        contexto2= instrucciones.read()
+
 
     contexto = (
         "Estás ayudando a organizar información extraída de una factura, haciendo que sea fácilmente interpretable y procesable en formato JSON. "
@@ -36,18 +40,25 @@ def procesar_factura():
 
     datos_factura_limpios = modelo.limpiar_prompt(datos_factura)
     datos_factura_mas_ordenes = f"Ahora genera SOLO el JSON, no añadas una respuesta de texto introductoria o final {datos_factura_limpios}"
-    prompt = modelo.agregar_contexto(contexto, datos_factura_mas_ordenes)
+    prompt = modelo.agregar_contexto(contexto2, datos_factura_mas_ordenes)
 
     json_generado = modelo.generar_json(prompt)
     return {"resultado": json_generado}
 
 
 def extraer_texto():
+    #ruta = "ejemplos_facturas/factura_ejemplo_diego.jpeg"
+    #ruta = "ejemplos_facturas/factura_simplificada1 - copia.jpeg"
+    ruta = "ejemplos_facturas/factura_simplificada2 - copia.jpeg"
 
     ruta5 = f"ejemplos_facturas/factura_ejemplo5.webp"
-    imagen = Image.open(ruta5)
+    imagen = Image.open(ruta)
+    custom_config = r'--psm 6 --oem 1'
 
-    texto_extraido = pytesseract.image_to_string(imagen)
+
+    texto_extraido = pytesseract.image_to_string(imagen, config=custom_config , lang="spa")
+
+    print(texto_extraido)
 
     return texto_extraido
 
@@ -68,50 +79,3 @@ def leer_archivo_txt(ruta_instrucciones = "jsons_plantilla_modelo/instrucciones.
         instrucciones = archivo.read()
     return instrucciones
 
-def comparar_estructura():
-
-    instrucciones = leer_archivo_txt()
-    diccionario_datos_modelo = {
-        "tipo_factura": "completa/simplificada/rectificativa",
-        "numero_factura": "12345",
-        "serie": "A001",
-        "fecha_expedicion": "DD-MM-YYYY",
-        "fecha_operacion": "DD-MM-YYYY",
-        "emisor": {
-            "nombre": "Nombre de la empresa",
-            "NIF_CIF": "A12345678",
-            "domicilio": "Calle Ejemplo 123, Ciudad"
-        },
-        "receptor": {
-            "nombre": "Nombre del cliente",
-            "NIF_CIF": "B98765432",
-            "domicilio": "Avenida Cliente 456, Ciudad"
-        },
-        "items": [
-            {
-                "descripcion": "Producto o servicio",
-                "cantidad": 1,
-                "precio_unitario": 100.0,
-                "tipo_IVA": 21,
-                "cuota_IVA": 21.0
-            },
-            {
-                "descripcion": "Otro producto",
-                "cantidad": 2,
-                "precio_unitario": 50.0,
-                "tipo_IVA": 10,
-                "cuota_IVA": 10.0
-            }
-        ],
-        "totales": {
-            "base_imponible": 200.0,
-            "total_IVA": 31.0,
-            "total_factura": 231.0
-        },
-        "menciones_especiales": "inversión del sujeto pasivo"
-        ,
-        "factura_rectificada": "Factura 54321"
-    }
-    claves = diccionario_datos_modelo.keys()
-
-    return instrucciones
