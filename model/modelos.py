@@ -12,36 +12,32 @@ class Usuario(BaseModel):
 """Clases para elementos de factura"""
 
 class Emisor(BaseModel):
-    nombre: str
-    NIF_CIF: str
-    domicilio: str
+    nombre: str = Field("", description="Nombre del emisor de la factura")
+    NIF_CIF: str = Field("", description="Número de identificación fiscal del emisor")
+    domicilio: str = Field("", description="Dirección del emisor")
 
 class Receptor(BaseModel):
-    nombre: str
-    NIF_CIF: str
-    domicilio: str
+    nombre: str = Field("", description="Nombre del receptor de la factura")
+    NIF_CIF: str = Field("", description="Número de identificación fiscal del receptor")
+    domicilio: str = Field("", description="Dirección del receptor")
 
 class Item(BaseModel):
-    descripcion: str
-    cantidad: int
-    precio_unitario: float
-    tipo_IVA: int
-    cuota_IVA: float
+    descripcion: str = Field("", description="Descripción del producto o servicio")
+    cantidad: int = Field(0, description="Cantidad comprada")
+    precio_unitario: float = Field(0.0, description="Precio por unidad")
+    tipo_IVA: int = Field(0, description="Tipo de IVA aplicado")
+    cuota_IVA: float = Field(0.0, description="Cuota de IVA calculada")
 
 class Factura(BaseModel):
-    tipo_factura: Literal["completa", "simplificada", "rectificativa"]
-    numero_factura: str
-    serie: Optional[str] = None
-    fecha_expedicion: Optional[date] = None
-    fecha_operacion: Optional[date] = None
-    emisor: Emisor
-    receptor: Optional[Receptor] = None
-    items: List[Item]
-    totales: dict
-    menciones_especiales: List[str] = []
-    factura_rectificada: Optional[str] = None
+    tipo_factura: Literal["completa", "simplificada", "rectificativa"] = Field("", description="Tipo de factura")
+    numero_factura: str = Field("", description="Número de factura")
+    serie: Optional[str] = Field("", description="Serie de la factura si aplica")
+    fecha_expedicion: Optional[date] = Field(None, description="Fecha en la que se expidió la factura")
+    fecha_operacion: Optional[date] = Field(None, description="Fecha en la que se realizó la operación")
+    emisor: Emisor = Field(Emisor(), description="Datos del emisor")
+    receptor: Optional[Receptor] = Field(Receptor(), description="Datos del receptor si aplica")
+    items: List[Item] = Field([], description="Lista de productos o servicios incluidos en la factura")
+    totales: dict = Field({}, description="Totales calculados de la factura")
+    menciones_especiales: List[str] = Field([], description="Menciones especiales de la factura si aplica")
+    factura_rectificada: Optional[str] = Field("", description="Número de la factura rectificada si aplica")
 
-    """class Config:
-        min_anystr_length = 1
-        anystr_strip_whitespace = True
-        use_enum_values = True"""
