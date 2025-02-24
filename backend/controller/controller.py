@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from model.modelos import Usuario
-from services.services_usuario import services_user
-import services.services_facturas.services_factura
+from backend.model.modelos import Usuario
+from backend.services.services_usuario import services_user
+from backend.services.services_facturas import services_factura
 
 router = APIRouter()
 
@@ -22,8 +22,8 @@ async def eliminar_usuario_id(id):
 
 @router.post("/procesar-factura")
 async def procesar_factura():
-    services.services_facturas.services_factura.procesar_factura()
+    services_factura.procesar_factura()
 
 @router.post("/consulta-parseada")
 def instrucciones():
-    services.services_facturas.services_factura.consulta_parseada()
+    services_factura.consulta_parseada()
