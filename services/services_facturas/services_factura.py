@@ -1,10 +1,10 @@
-from http.client import responses
-from typing import Literal
+
 
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, EmailStr, Field
+from langchain_community.callbacks import get_openai_callback  #Se instaló para llevar conteo de los tokens de las peticiones
+from sqlalchemy.dialects.postgresql import JSONB
 
 from model.modelos import Factura
 from supabase_db import SupabaseDB
@@ -55,13 +55,28 @@ def consulta_parseada():
 
     chain = prompt | llm | parser
 
-    factura_extraida = chain.invoke({"query": extraer_texto()})
+    # Usa el callback para obtener métricas de la consulta, tiene que crearse asi con bloque with
+    with get_openai_callback() as cb:
+        # Ejecuta la cadena con la consulta
+        factura_extraida = chain.invoke({"query": extraer_texto()})
 
-    print(factura_extraida)
-    print(type(factura_extraida))
-    print(factura_extraida.emisor)
+        # Guarda las métricas en variables
+        total_tokens = cb.total_tokens
+        total_cost = cb.total_cost
+
+    generar_coste_consulta_estructurada(llm.model_name, total_tokens, total_cost)
+    factura_json = factura_extraida.model_dump_json()
+    guardar_datos_factura_json(json.loads(factura_json))
     return factura_extraida
 
+def guardar_datos_factura_json(datos_json):
+    db=SupabaseDB()
+    db.insertar_factura(datos_json)
+
+
+def generar_coste_consulta_estructurada(modelo, tokens, tokens_cost):
+    db= SupabaseDB()
+    db.coste_consulta_estructurada(modelo, tokens,tokens_cost)
 
 def procesar_factura():
 

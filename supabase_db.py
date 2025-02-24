@@ -52,6 +52,16 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
+    def coste_consulta_estructurada(
+        self, modelo,total_tokens, cost
+    ):
+        data = {
+            "model": modelo,
+            "total_tokens": total_tokens,
+            "cost": cost,
+        }
+        self.supabase.table("openai_requests").insert(data).execute()
+
 
     def registrar_usuario(self, email: str, password: str):
 
