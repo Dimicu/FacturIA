@@ -1,14 +1,14 @@
-import streamlit as st
-import requests
+from time import sleep
 from pages.login import login_page
+import streamlit as st
 
-# API_URL = "http://127.0.0.1:8000/login"  # Cambiar el puerto si es necesario
+# Configuración de la página
+st.set_page_config(page_title="FacturIA")
+st.title("Mainpage")
+# Sidebar
+with st.sidebar:
 
-
-def index():
-    st.title("Bienvenido a FacturAi")
-
+    st.sidebar.success("Elije un apartado")
 
 if __name__ == "__main__":
-    index()
     login_page()

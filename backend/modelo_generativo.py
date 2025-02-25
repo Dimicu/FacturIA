@@ -41,7 +41,7 @@ class ModeloGPT:
 
     def generar_json(self, prompt,modelo="gpt-4-turbo", max_tokens=1500):
 
-        carpeta = f"jsons_generados"
+        carpeta = f"backend/jsons_generados"
        
         messages = [
             {"role": "system", "content": "Actua como experto en facturación"},
