@@ -7,22 +7,27 @@ router = APIRouter()
 
 
 @router.post("/login")
-async def login(usuario: Usuario):
-    services_user.login_o_registro(usuario)
+def login(usuario: Usuario):
+    response_login = services_user.login_o_registro(usuario)
+    return response_login
 
 
 @router.put("/usuarios")
 async def actualizar_datos_usuario(usuario: Usuario):
     services_user.actualizar_password(usuario)
+    return "usuario actualizado"
 
 
 @router.delete("/usuarios/{id}")
-async def eliminar_usuario_id(id):
+async def eliminar_usuario_id(id: int):
     services_user.borrar_usuarios(id)
+    return "usuario eliminado"
+
 
 @router.post("/procesar-factura")
 async def procesar_factura():
     services.services_facturas.services_factura.procesar_factura()
+
 
 @router.post("/consulta-parseada")
 def instrucciones():

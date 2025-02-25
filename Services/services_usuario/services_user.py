@@ -7,19 +7,13 @@ db = SupabaseDB()
 app = FastAPI()
 
 
-def login_o_registro(usuario: Usuario):
+def login_o_registro(usuario: dict):
 
-    if db.login_usuario(usuario.email, usuario.password):
-        return {"mensaje": f"Bienvenido {usuario.email} a FacturAi."}
-    else:
-        respuesta = input(
-            "Usuario no encontrado o datos incorrectos. ¿Quieres registrarte? (s/n): "
-        ).lower()
-        if respuesta == "s":
-            db.registrar_usuario(usuario.email, usuario.password)
-            return {"mensaje": "Usuario registrado correctamente"}
-        else:
-            return {"mensaje": "No se ha registrado al usuario. Intenta de nuevo."}
+    email = usuario.get("email", "").lower()
+    password = usuario.get("password", "")
+
+    response_login_o_registro = db.login_usuario(email, password)
+    return response_login_o_registro
 
 
 def actualizar_password(usuario: Usuario):

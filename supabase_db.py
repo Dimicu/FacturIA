@@ -1,8 +1,10 @@
 import json
 import os
 import bcrypt
+import requests
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from utils.throw_json_error import throw_json_error
 
 
 class SupabaseDB:
@@ -23,7 +25,9 @@ class SupabaseDB:
 
     def insertar_factura(self, data: dict):
 
-        response = self.supabase.table("facturas").insert({"datos_factura": data}).execute()
+        response = (
+            self.supabase.table("facturas").insert({"datos_factura": data}).execute()
+        )
         return response
 
     def actualizar_factura(self, email: str, updates: dict):
@@ -52,7 +56,6 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
-
     def registrar_usuario(self, email: str, password: str):
 
         respuesta_si_existe = (
@@ -74,21 +77,24 @@ class SupabaseDB:
         print(f"{email} te has registrado correctamente.")
 
     def login_usuario(self, email: str, password: str):
+
         response = self.supabase.table("users").select("*").eq("email", email).execute()
 
         if response.data:
             user = response.data[0]
+
             if bcrypt.checkpw(
                 password.encode("utf-8"), user["password"].encode("utf-8")
             ):
-                print(f"Bienvenido, {user['email']}")
-                return True
+
+                return throw_json_error("Login exitoso", 200).to_json()
             else:
-                print("Datos incorrectos")
-                return False
+                error = throw_json_error("Contraseña incorrecta o Usuario", 400)
+                return error.to_json()
+
         else:
-            print("Usuario no registrado, debe registrarse")
-            return False
+            error = throw_json_error("Usuario no registrado", 404)
+            return error.to_json()
 
     def actualizar_Users(self, email, password, role):
 
