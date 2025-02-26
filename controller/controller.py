@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File
+
 from model.modelos import Usuario
 from services.services_usuario import services_user
 import services.services_facturas.services_factura
@@ -27,3 +28,16 @@ async def procesar_factura():
 @router.post("/consulta-parseada")
 def instrucciones():
     services.services_facturas.services_factura.consulta_parseada()
+
+@router.post("/upload_factura")
+async def upload_factura(file:UploadFile = File(...)):
+
+    content = await file.read()  # Leer el contenido del archivo
+    file_size = len(content)  # Obtener el tamaño del archivo correctamente
+
+    response = await services.services_facturas.services_factura.serv_subir_factura(content, file.filename, file.content_type) # Lee el archivo y pasa el nombre
+    return {
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "size": file_size
+    }

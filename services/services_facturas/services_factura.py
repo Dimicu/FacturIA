@@ -78,6 +78,11 @@ def generar_coste_consulta_estructurada(modelo, tokens, tokens_cost):
     db= SupabaseDB()
     db.coste_consulta_estructurada(modelo, tokens,tokens_cost)
 
+
+async def serv_subir_factura(filedata, file, filename):
+    db = SupabaseDB()
+    await db.sp_subir_imagen_factura(filedata, file, filename)
+
 def procesar_factura():
 
 
