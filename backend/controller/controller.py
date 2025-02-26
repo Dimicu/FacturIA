@@ -8,8 +8,14 @@ router = APIRouter()
 
 @router.post("/login")
 def login(usuario: Usuario):
-    response_login = services_user.login_o_registro(usuario)
+    response_login = services_user.login(usuario)
     return response_login
+
+
+@router.post("/registro")
+def registro(usuario: Usuario):
+    response_registro = services_user.registro(usuario)
+    return response_registro
 
 
 @router.put("/usuarios")

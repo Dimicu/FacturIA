@@ -7,13 +7,22 @@ db = SupabaseDB()
 app = FastAPI()
 
 
-def login_o_registro(usuario: dict):
+def login(usuario: dict):
 
     email = usuario.get("email", "").lower()
     password = usuario.get("password", "")
 
     response_login_o_registro = db.login_usuario(email, password)
     return response_login_o_registro
+
+
+def registro(usuario: dict):
+
+    email = usuario.get("email", "").lower()
+    password = usuario.get("password", "")
+
+    response_registro = db.registrar_usuario(email, password)
+    return response_registro
 
 
 def actualizar_password(usuario: Usuario):
