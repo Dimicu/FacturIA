@@ -6,18 +6,18 @@ from langchain_openai import ChatOpenAI
 from langchain_community.callbacks import get_openai_callback  #Se instaló para llevar conteo de los tokens de las peticiones
 from sqlalchemy.dialects.postgresql import JSONB
 
-from model.modelos import Factura
-from supabase_db import SupabaseDB
+from backend.model.modelos import Factura
+from backend.supabase_db import SupabaseDB
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from modelo_generativo import ModeloGPT
+from backend.modelo_generativo import ModeloGPT
 import json
 import os
 from PIL import Image
 import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = (
-    r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 )
 
 
@@ -87,7 +87,7 @@ def procesar_factura():
 
 
     datos_factura = extraer_texto()
-    with open ("jsons_plantilla_modelo/instrucciones.txt", "r") as instrucciones:
+    with open ("backend/jsons_plantilla_modelo/instrucciones.txt", "r") as instrucciones:
         contexto2= instrucciones.read()
 
 
@@ -110,7 +110,7 @@ def procesar_factura():
 def extraer_texto():
     #ruta = "ejemplos_facturas/factura_ejemplo_diego.jpeg"
     #ruta = "ejemplos_facturas/factura_simplificada1 - copia.jpeg"
-    ruta = "ejemplos_facturas/factura_simplificada2 - copia.jpeg"
+    ruta = "backend/ejemplos_facturas/factura_simplificada1 - copia.jpeg"
 
     ruta5 = f"ejemplos_facturas/factura_ejemplo5.webp"
     imagen = Image.open(ruta)
@@ -125,7 +125,7 @@ def extraer_texto():
 
 
 def estructurar_datos():
-    ruta_json_ejemplo = "jsons_plantilla_modelo/ejemplo_factura.json"
+    ruta_json_ejemplo = "backend/jsons_plantilla_modelo/ejemplo_factura.json"
 
     with open(ruta_json_ejemplo, "r", encoding="utf-8") as archivo_json:
         ejemplo_datos = json.load(archivo_json)

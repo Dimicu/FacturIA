@@ -1,6 +1,6 @@
-from supabase_db import SupabaseDB
+from backend.supabase_db import SupabaseDB
 from fastapi import FastAPI
-from model.modelos import Usuario
+from backend.model.modelos import Usuario
 
 
 db = SupabaseDB()
