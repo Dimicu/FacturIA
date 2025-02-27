@@ -48,7 +48,8 @@ class SupabaseDB:
         )
         return response
 
-    def coste_consulta_estructurada(
+    # Metodos tabla de costes
+    def coste_guardar_fact_tabla(
         self, modelo,total_tokens, cost
     ):
         data = {
@@ -58,42 +59,18 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
-    # Metodos tabla de costes
-    def insertar_datos_coste(
-        self, modelo, input_tokens, output_tokens, total_tokens, cost
-    ):
-        data = {
-            "model": modelo,
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "total_tokens": total_tokens,
-            "cost": cost,
-        }
-        self.supabase.table("openai_requests").insert(data).execute()
-
 #Metodos subida de imagenes
     async def sp_subir_imagen_factura(self, file_data, filename,content_type):
         """Sube una factura a Supabase Storage."""
-        try:
+        # Subir archivo a Supabase Storage
+        response = self.supabase.storage.from_("imagenes_facturas").upload(
+            path=filename,  # Se guarda con el mismo nombre del archivo
+            file=file_data,
+            file_options={"content-type": content_type}  # Mantener el tipo de archivo
+        )
 
-            # Subir archivo a Supabase Storage
-            response = self.supabase.storage.from_("imagenes_facturas").upload(
-                path=filename,  # Se guarda con el mismo nombre del archivo
-                file=file_data,
-                file_options={"content-type": content_type}  # Mantener el tipo de archivo
-            )
 
-            if "error" in response:
-                raise HTTPException(status_code=500, detail="Error al subir a Supabase")
 
-            return {
-                "filename": filename,
-                "content_type": content_type,
-                "size": len(file_data),
-                "supabase_url": f"/storage/v1/object/public/{"imagenes_facturas"}/{"filename"}"
-            }
-        except Exception as e:
-            return {"error": str(e)}
 
     #Metodos CRUD usuarios
     def registrar_usuario(self, email: str, password: str):

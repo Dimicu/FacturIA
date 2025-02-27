@@ -1,4 +1,8 @@
+from http.client import HTTPResponse, HTTPConnection
+
 from fastapi import APIRouter
+from starlette.responses import JSONResponse
+
 from backend.model.modelos import Usuario
 from backend.services.services_usuario import services_user
 from backend.services.services_facturas import services_factura
@@ -29,17 +33,17 @@ async def eliminar_usuario_id(id):
 async def procesar_factura():
     backend.services.services_facturas.services_factura.procesar_factura()
 
-@router.post("/consulta-parseada")
-def instrucciones():
-    backend.services.services_facturas.services_factura.consulta_parseada()
+@router.post("/guardar-json-factura")
+def guardar_fact_tabla():
+    backend.services.services_facturas.services_factura.srv_guardar_fact_tabla()
 
-@router.post("/upload_factura")
-async def upload_factura(file:UploadFile = File(...)):
+@router.post("/guardar-imagen-factura")
+async def guardar_fact_storage(file:UploadFile = File(...)):
 
     content = await file.read()  # Leer el contenido del archivo
     file_size = len(content)  # Obtener el tamaño del archivo correctamente
 
-    response = await backend.services.services_facturas.services_factura.serv_subir_factura(content, file.filename, file.content_type) # Lee el archivo y pasa el nombre
+    await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(content, file.filename, file.content_type) # Lee el archivo y pasa el nombre
     return {
         "filename": file.filename,
         "content_type": file.content_type,

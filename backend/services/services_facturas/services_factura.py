@@ -28,7 +28,7 @@ modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 app = FastAPI()
 
 
-def consulta_parseada():
+def srv_guardar_fact_tabla():
     parser = PydanticOutputParser(pydantic_object=Factura)
     prompt = ChatPromptTemplate.from_messages([
         ("system", """
@@ -64,22 +64,41 @@ def consulta_parseada():
         total_tokens = cb.total_tokens
         total_cost = cb.total_cost
 
-    generar_coste_consulta_estructurada(llm.model_name, total_tokens, total_cost)
+    serv_coste_guardar_fact_tabla(llm.model_name, total_tokens, total_cost)
     factura_json = factura_extraida.model_dump_json()
-    guardar_datos_factura_json(json.loads(factura_json))
+    serv_guardar_datos_factura_json(json.loads(factura_json))
     return factura_extraida
 
-def guardar_datos_factura_json(datos_json):
+def serv_guardar_datos_factura_json(datos_json):
+    """
+    Guarda los datos de la factura en json en la base de datos
+    :param datos_json:
+    :return:
+    """
     db=SupabaseDB()
     db.insertar_factura(datos_json)
 
 
-def generar_coste_consulta_estructurada(modelo, tokens, tokens_cost):
+def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
+    """
+    Guarda el coste de hacer la peticion a la API en base de datos
+    :param modelo:
+    :param tokens:
+    :param tokens_cost:
+    :return:
+    """
     db= SupabaseDB()
-    db.coste_consulta_estructurada(modelo, tokens,tokens_cost)
+    db.coste_guardar_fact_tabla(modelo, tokens,tokens_cost)
 
 
-async def serv_subir_factura(filedata, file, filename):
+async def serv_subir_imagen_factura(filedata, file, filename):
+    """
+    Sube archivo de imagen al storage de supabase
+    :param filedata:
+    :param file:
+    :param filename:
+    :return:
+    """
     db = SupabaseDB()
     await db.sp_subir_imagen_factura(filedata, file, filename)
 

@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from supabase_db import SupabaseDB
+from backend.supabase_db import SupabaseDB
 
 
 class ModeloGPT:
@@ -91,7 +91,7 @@ class ModeloGPT:
                 except json.JSONDecodeError as e:
                     """print("Error al decodificar JSON:", e)"""
 
-                db.insertar_datos_coste(modelo,input_tokens,output_tokens, total_tokens, cost)
+
                 db.insertar_factura(datos_formateados)
                 print("Insercion factura correcta")
                 print("Insercion datos costes correctos")
