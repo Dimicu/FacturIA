@@ -29,10 +29,9 @@ class SupabaseDB:
         self.supabase: Client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
 
     #Metodos CRUD tabla facturas
-    def insertar_factura(self, data: dict):
+    async def insertar_factura(self, data: dict):
 
-        response = self.supabase.table("facturas").insert({"datos_factura": data}).execute()
-        return response
+        self.supabase.table("facturas").insert({"datos_factura": data}).execute()
 
     def actualizar_factura(self, email: str, updates: dict):
 
