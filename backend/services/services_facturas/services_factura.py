@@ -1,5 +1,5 @@
 
-
+import io
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 from backend.model.modelos import Factura
 from backend.supabase_db import SupabaseDB
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from dotenv import load_dotenv
 from backend.modelo_generativo import ModeloGPT
 import json
@@ -28,13 +28,13 @@ modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 app = FastAPI()
 
 
-def srv_guardar_fact_tabla():
+def srv_interpretar_factura(texto_factura):
     parser = PydanticOutputParser(pydantic_object=Factura)
     prompt = ChatPromptTemplate.from_messages([
         ("system", """
             Eres un asistente experto en facturación, especializado en la extracción de datos de facturas. 
             Ten en cuenta las siguientes recomendaciones :
-            - Identificación del tipo de factura:
+            - Identificación del tipo de factura: 
                 -Rectificativa: si se hace mención a esta palabra y acompaña un numero de otra factura , se considerará rectificativa
                 -Simplificada: si se hace mencion a esta palabra , se considera simplificada. En caso de no aparacer la palabra simplificada y no haber datos del receptor se considerará simplificada
                 -Completa: cuando existe un emisor y un receptor en la factura
@@ -58,25 +58,26 @@ def srv_guardar_fact_tabla():
     # Usa el callback para obtener métricas de la consulta, tiene que crearse asi con bloque with
     with get_openai_callback() as cb:
         # Ejecuta la cadena con la consulta
-        factura_extraida = chain.invoke({"query": extraer_texto()})
+        factura_extraida = chain.invoke({"query": texto_factura})
 
         # Guarda las métricas en variables
         total_tokens = cb.total_tokens
         total_cost = cb.total_cost
 
     serv_coste_guardar_fact_tabla(llm.model_name, total_tokens, total_cost)
-    factura_json = factura_extraida.model_dump_json()
-    serv_guardar_datos_factura_json(json.loads(factura_json))
-    return factura_extraida
+    respuesta_JSON_Texto = factura_extraida.model_dump_json()
+    respuesta_JSON_estructurado = (json.loads(respuesta_JSON_Texto))
+    print(respuesta_JSON_estructurado)
+    return respuesta_JSON_estructurado
 
-def serv_guardar_datos_factura_json(datos_json):
+async def serv_guardar_datos_factura_json(datos_json):
     """
     Guarda los datos de la factura en json en la base de datos
     :param datos_json:
     :return:
     """
     db=SupabaseDB()
-    db.insertar_factura(datos_json)
+    await db.insertar_factura(datos_json)
 
 
 def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
@@ -142,6 +143,14 @@ def extraer_texto():
 
     return texto_extraido
 
+async def extraer_texto_imagen_subida(content:bytes):
+
+    imagen = Image.open(io.BytesIO(content))
+    custom_config = r'--psm 3 --oem 1'
+
+    texto_extraido = pytesseract.image_to_string(imagen, config=custom_config, lang="spa")
+
+    return texto_extraido
 
 def estructurar_datos():
     ruta_json_ejemplo = "backend/jsons_plantilla_modelo/ejemplo_factura.json"
