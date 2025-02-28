@@ -29,7 +29,7 @@ class Item(BaseModel):
     cuota_IVA: float = Field(0.0, description="Cuota de IVA calculada")
 
 class Factura(BaseModel):
-    tipo_factura: Literal["completa", "simplificada", "rectificativa"] = Field("", description="Tipo de factura")
+    tipo_factura: Optional[str] = Field("", description="Tipo de factura")
     numero_factura: str = Field("", description="Número de factura")
     serie: Optional[str] = Field("", description="Serie de la factura si aplica")
     fecha_expedicion: Optional[date] = Field(None, description="Fecha en la que se expidió la factura")
