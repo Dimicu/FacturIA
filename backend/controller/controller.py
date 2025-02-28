@@ -1,5 +1,8 @@
+import io
+import uuid
 from http.client import HTTPResponse, HTTPConnection
 
+from PIL.Image import Image
 from fastapi import APIRouter
 from starlette.responses import JSONResponse
 
@@ -29,23 +32,33 @@ async def actualizar_datos_usuario(usuario: Usuario):
 async def eliminar_usuario_id(id):
     services_user.borrar_usuarios(id)
 
-@router.post("/procesar-factura")
+"""@router.post("/procesar-factura")
 async def procesar_factura():
-    backend.services.services_facturas.services_factura.procesar_factura()
+    backend.services.services_facturas.services_factura.procesar_factura()"""
 
-@router.post("/guardar-json-factura")
-def guardar_fact_tabla():
-    backend.services.services_facturas.services_factura.srv_guardar_fact_tabla()
+@router.post("/facturas/api/json")
+def extraer_json_formateado(texto):
+    backend.services.services_facturas.services_factura.srv_interpretar_factura(texto)
 
-@router.post("/guardar-imagen-factura")
+@router.post("/imagenes/storage")
 async def guardar_fact_storage(file:UploadFile = File(...)):
 
     content = await file.read()  # Leer el contenido del archivo
     file_size = len(content)  # Obtener el tamaño del archivo correctamente
 
     await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(content, file.filename, file.content_type) # Lee el archivo y pasa el nombre
-    return {
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "size": file_size
-    }
+
+@router.post("/facturas/completo")
+async def guardar_fact_completa(file:UploadFile = File(...)):
+    #Se crea nombre de archivo unico
+    nombre_imagen = f"{uuid.uuid4()}_{file.filename}"
+    #Leer el contenido de bytes de la imagen
+    content = await file.read()
+    #Extrae texto de la imagen
+    texto_extraido = await backend.services.services_facturas.services_factura.extraer_texto_imagen_subida(content)
+    #Envia ese texto junto con un contexto e instrucciones a la API
+    respuesta_api =  backend.services.services_facturas.services_factura.srv_interpretar_factura(texto_extraido)
+    #Enviar la respuesta de la API a la base de datos añadiendo un campo de nombre para la imagen
+    respuesta_api["nombre_imagen"] = nombre_imagen
+    await backend.services.services_facturas.services_factura.serv_guardar_datos_factura_json(respuesta_api)
+    await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(content, nombre_imagen, file.content_type)
