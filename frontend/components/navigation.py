@@ -4,11 +4,13 @@ from .sidebar import side_bar_button_style
 # Opciones del menú
 MENU_OPCIONES = {
     "Mis facturas": "Mis facturas",
-    "anadir_factura": "anadir_factura"
+    "anadir_factura": "anadir_factura",
 }
+
 
 def cambiar_pagina():
     st.session_state.pagina = st.session_state.nueva_pagina
+
 
 def render_sidebar():
     user = "User"
@@ -23,6 +25,6 @@ def render_sidebar():
         # Botones del menú
         for nombre, valor in MENU_OPCIONES.items():
             if nombre != "anadir_factura":
-                if st.markdown(side_bar_button_style(nombre),unsafe_allow_html=True):
+                if st.markdown(side_bar_button_style(nombre), unsafe_allow_html=True):
                     st.session_state.nueva_pagina = valor
                     cambiar_pagina()

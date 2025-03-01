@@ -20,6 +20,7 @@ def login(usuario: Usuario):
 @router.post("/registro")
 def registro(usuario: Usuario):
     response_registro = services_user.registro(usuario)
+    print("desde controller", response_registro)
     return response_registro
 
 

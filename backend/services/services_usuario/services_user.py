@@ -22,6 +22,7 @@ def registro(usuario: dict):
     password = usuario.get("password", "")
 
     response_registro = db.registrar_usuario(email, password)
+    print("desde services", response_registro)
     return response_registro
 
 

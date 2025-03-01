@@ -62,8 +62,8 @@ def login_page():
                 st.error(f"Error: {error_message}")
                 st.button("Registrarse")
 
-                response_register = registro(user_data)
-                print(response_register)
+                # response_register = registro(user_data)
+                # print(response_register)
 
             else:
                 st.error(f"Error desconocido: {error_message}")

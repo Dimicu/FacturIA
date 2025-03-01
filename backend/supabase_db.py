@@ -5,7 +5,8 @@ from http.client import HTTPException
 import bcrypt
 import requests
 from dotenv import load_dotenv
-from multipart import file_path
+
+# from multipart import file_path
 from starlette.datastructures import UploadFile
 from supabase import create_client, Client
 from utils.throw_json_error import throw_json_error
@@ -101,24 +102,55 @@ class SupabaseDB:
 
     # Metodos CRUD usuarios
     def registrar_usuario(self, email: str, password: str):
+        try:
 
-        respuesta_si_existe = (
-            self.supabase.table("users").select("*").eq("email", email).execute()
-        )
+            respuesta_si_existe = (
+                self.supabase.table("users")
+                .select("email")
+                .eq("email", email)
+                .execute()
+            )
 
-        if respuesta_si_existe.data:
-            print(f"El correo electrónico {email} ya está registrado.")
-        else:
-            password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+            if respuesta_si_existe.data and len(respuesta_si_existe.data) > 0:
+                emailCheckeado = respuesta_si_existe.data[0]
 
-        self.supabase.table("users").insert(
-            {
-                "email": email,
-                "password": password_hash.decode("utf-8"),
-                "role": "reader",
-            }
-        ).execute()
-        print(f"{email} te has registrado correctamente.")
+                if emailCheckeado["email"] == email:
+                    return throw_json_error(
+                        f"El correo electrónico {email} ya está registrado.", 400
+                    ).to_json()
+
+            else:
+                password_hash = bcrypt.hashpw(
+                    password.encode("utf-8"), bcrypt.gensalt()
+                )
+
+                respuesta_insertar = (
+                    self.supabase.table("users")
+                    .insert(
+                        {
+                            "email": email,
+                            "password": password_hash.decode("utf-8"),
+                            "role": "reader",
+                        }
+                    )
+                    .execute()
+                )
+                if respuesta_insertar.data:
+
+                    return throw_json_error(
+                        f"Usuario registrado correctamente con el correo {email}", 201
+                    ).to_json()
+
+                else:
+                    return throw_json_error(
+                        "No se pudo registrar el usuario debido a un error en la base de datos",
+                        500,
+                    ).to_json()
+
+        except Exception as e:
+            return throw_json_error(
+                f"Hubo un problema al registrar el usuario(backend) {str(e)}", 500
+            ).to_json()
 
     def login_usuario(self, email: str, password: str):
 
@@ -133,12 +165,12 @@ class SupabaseDB:
 
                 return throw_json_error("Login exitoso", 200).to_json()
             else:
-                error = throw_json_error("Contraseña incorrecta o Usuario", 400)
-                return error.to_json()
+                return throw_json_error(
+                    "Contraseña incorrecta o Usuario", 400
+                ).to_json()
 
         else:
-            error = throw_json_error("Usuario no registrado", 404)
-            return error.to_json()
+            return throw_json_error("Usuario no registrado", 404).to_json()
 
     def actualizar_Users(self, email, password, role):
 

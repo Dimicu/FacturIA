@@ -1,14 +1,13 @@
-from time import sleep
-from pages.login import login_page
+# from time import sleep
+# from pages.login import login_page
 import streamlit as st
 
-# Configuración de la página
-st.set_page_config(page_title="FacturIA")
-st.title("Mainpage")
-# Sidebar
-with st.sidebar:
 
-    st.sidebar.success("Elije un apartado")
+st.title("Bienvenidos a FacturIA")
 
-if __name__ == "__main__":
-    login_page()
+if st.button("Inicia Sesión"):
+    st.Page("pages/login.py")
+
+
+if st.button("Registrar"):
+    st.Page("pages/register.py")
