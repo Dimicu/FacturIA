@@ -94,6 +94,7 @@ class ModeloGPT:
                 db.insertar_datos_coste(
                     modelo, input_tokens, output_tokens, total_tokens, cost
                 )
+
                 db.insertar_factura(datos_formateados)
                 print("Insercion factura correcta")
                 print("Insercion datos costes correctos")
