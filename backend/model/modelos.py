@@ -37,12 +37,23 @@ class Factura(BaseModel):
     tipo_factura: Optional[str] = Field("", description="Tipo de factura")
     numero_factura: str = Field("", description="Número de factura")
     serie: Optional[str] = Field("", description="Serie de la factura si aplica")
-    fecha_expedicion: Optional[date] = Field(None, description="Fecha en la que se expidió la factura")
-    fecha_operacion: Optional[date] = Field(None, description="Fecha en la que se realizó la operación")
+    fecha_expedicion: Optional[date] = Field(
+        None, description="Fecha en la que se expidió la factura"
+    )
+    fecha_operacion: Optional[date] = Field(
+        None, description="Fecha en la que se realizó la operación"
+    )
     emisor: Emisor = Field(Emisor(), description="Datos del emisor")
-    receptor: Optional[Receptor] = Field(Receptor(), description="Datos del receptor si aplica")
-    items: List[Item] = Field([], description="Lista de productos o servicios incluidos en la factura")
+    receptor: Optional[Receptor] = Field(
+        Receptor(), description="Datos del receptor si aplica"
+    )
+    items: List[Item] = Field(
+        [], description="Lista de productos o servicios incluidos en la factura"
+    )
     totales: dict = Field({}, description="Totales calculados de la factura")
-    menciones_especiales: List[str] = Field([], description="Menciones especiales de la factura si aplica")
-    factura_rectificada: Optional[str] = Field("", description="Número de la factura rectificada si aplica")
-
+    menciones_especiales: List[str] = Field(
+        [], description="Menciones especiales de la factura si aplica"
+    )
+    factura_rectificada: Optional[str] = Field(
+        "", description="Número de la factura rectificada si aplica"
+    )

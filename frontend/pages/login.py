@@ -2,6 +2,7 @@ import streamlit as st
 import sys
 import os
 import time
+import requests
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
@@ -33,7 +34,9 @@ def login_page():
         else:
             user_data = {"email": email, "password": password}
 
-            response = login(user_data)
+            response = requests.post(
+                "http://127.0.0.1:8000/login", json=user_data
+            ).json()
 
             error_message = ""
             status_code = 0
@@ -67,3 +70,6 @@ def login_page():
 
             else:
                 st.error(f"Error desconocido: {error_message}")
+
+
+login_page()

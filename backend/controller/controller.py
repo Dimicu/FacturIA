@@ -20,7 +20,7 @@ router = APIRouter()
 
 @router.post("/login")
 def login(usuario: Usuario):
-    response_login = services_user.login(usuario)
+    response_login = services_user.login(dict(usuario))
     return response_login
 
 
@@ -47,29 +47,44 @@ async def eliminar_usuario_id(id: int):
 async def procesar_factura():
     backend.services.services_facturas.services_factura.procesar_factura()"""
 
+
 @router.post("/facturas/api/json")
 def extraer_json_formateado(texto):
     backend.services.services_facturas.services_factura.srv_interpretar_factura(texto)
 
+
 @router.post("/imagenes/storage")
-async def guardar_fact_storage(file:UploadFile = File(...)):
+async def guardar_fact_storage(file: UploadFile = File(...)):
 
     content = await file.read()  # Leer el contenido del archivo
     file_size = len(content)  # Obtener el tamaño del archivo correctamente
 
-    await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(content, file.filename, file.content_type) # Lee el archivo y pasa el nombre
+    await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
+        content, file.filename, file.content_type
+    )  # Lee el archivo y pasa el nombre
+
 
 @router.post("/facturas/completo")
-async def guardar_fact_completa(file:UploadFile = File(...)):
-    #Se crea nombre de archivo unico
+async def guardar_fact_completa(file: UploadFile = File(...)):
+    # Se crea nombre de archivo unico
     nombre_imagen = f"{uuid.uuid4()}_{file.filename}"
-    #Leer el contenido de bytes de la imagen
+    # Leer el contenido de bytes de la imagen
     content = await file.read()
-    #Extrae texto de la imagen
-    texto_extraido = await backend.services.services_facturas.services_factura.extraer_texto_imagen_subida(content)
-    #Envia ese texto junto con un contexto e instrucciones a la API
-    respuesta_api =  backend.services.services_facturas.services_factura.srv_interpretar_factura(texto_extraido)
-    #Enviar la respuesta de la API a la base de datos añadiendo un campo de nombre para la imagen
+    # Extrae texto de la imagen
+    texto_extraido = await backend.services.services_facturas.services_factura.extraer_texto_imagen_subida(
+        content
+    )
+    # Envia ese texto junto con un contexto e instrucciones a la API
+    respuesta_api = (
+        backend.services.services_facturas.services_factura.srv_interpretar_factura(
+            texto_extraido
+        )
+    )
+    # Enviar la respuesta de la API a la base de datos añadiendo un campo de nombre para la imagen
     respuesta_api["nombre_imagen"] = nombre_imagen
-    await backend.services.services_facturas.services_factura.serv_guardar_datos_factura_json(respuesta_api)
-    await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(content, nombre_imagen, file.content_type)
+    await backend.services.services_facturas.services_factura.serv_guardar_datos_factura_json(
+        respuesta_api
+    )
+    await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
+        content, nombre_imagen, file.content_type
+    )
