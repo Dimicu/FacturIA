@@ -20,13 +20,13 @@ router = APIRouter()
 
 @router.post("/login")
 def login(usuario: Usuario):
-    response_login = services_user.login(usuario)
+    response_login = services_user.login(dict(usuario))
     return response_login
 
 
 @router.post("/registro")
 def registro(usuario: Usuario):
-    response_registro = services_user.registro(usuario)
+    response_registro = services_user.registro(dict(usuario))
     print("desde controller", response_registro)
     return response_registro
 
