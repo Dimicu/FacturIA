@@ -2,7 +2,6 @@ import streamlit as st
 import sys
 import os
 import requests
-#COMENTAR QUE ESTE PATH FUE CAMBIADO PORQUE SINO NO ME IMPORTABA, CONTRASTAR
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from backend.controller.controller import registro
 
