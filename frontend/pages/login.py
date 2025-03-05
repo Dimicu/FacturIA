@@ -3,25 +3,26 @@ import sys
 import os
 import time
 
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from backend.controller.controller import login
-from backend.controller.controller import registro
+# from backend.controller.controller import registro
 
 
 def login_page():
     st.title("Iniciar sesión en FacturIA")
 
     if st.session_state.get("logged_in", False):
-        st.success(f"Ya has iniciado sesión como {st.session_state['email']}")
-        st.button("Crear factura")
-        st.button("Actualizar factura")
+        st.session_state.authenticated = True
+        st.rerun()
+        # st.success(f"Ya has iniciado sesión como {st.session_state['email']}")
+        # st.button("Crear factura")
+        # st.button("Actualizar factura")
 
-        if st.button("Cerrar sesión"):
-            st.session_state["logged_in"] = False
-            st.session_state["email"] = ""
-            st.rerun()
-        return
+        # if st.button("Cerrar sesión"):
+        #     st.session_state["logged_in"] = False
+        #     st.session_state["email"] = ""
+        #     st.rerun()
+        # return
 
     email = st.text_input("Correo electrónico")
     password = st.text_input("Contraseña", type="password")
@@ -58,12 +59,13 @@ def login_page():
 
             elif status_code == 400:
                 st.error(f"Error: {error_message}")
-            elif status_code == 404:
-                st.error(f"Error: {error_message}")
-                st.button("Registrarse")
-
-                # response_register = registro(user_data)
-                # print(response_register)
+            # elif status_code == 404:
+            #     st.error(f"Error: {error_message}")
+            #     st.button("Registrarse")
+            #
+            #     response_register = registro(user_data)
+            #     print(response_register)
 
             else:
                 st.error(f"Error desconocido: {error_message}")
+login_page()

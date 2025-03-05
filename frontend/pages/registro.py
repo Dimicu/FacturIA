@@ -3,7 +3,7 @@ import sys
 import os
 import requests
 #COMENTAR QUE ESTE PATH FUE CAMBIADO PORQUE SINO NO ME IMPORTABA, CONTRASTAR
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from backend.controller.controller import registro
 
 backend_url = "http://localhost:8000"
