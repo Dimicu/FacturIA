@@ -1,13 +1,22 @@
-# from time import sleep
-# from pages.login import login_page
 import streamlit as st
 
+# Configuración de la página
+st.set_page_config(page_title="FacturIA")
 
-st.title("Bienvenidos a FacturIA")
+# Verificar si el usuario ha iniciado sesión
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
 
-if st.button("Inicia Sesión"):
-    st.Page("pages/login.py")
+# Si el usuario está autenticado, mostrar la MainPage
+if st.session_state.authenticated:
+    pageManager = st.navigation([
+        st.Page("main.py", title="Principal", default=True)
+    ])
+else:
+    pageManager = st.navigation([
+        st.Page("home.py", title="Inicio", default=True),
+        st.Page("pages/login.py", title="Login"),
+        st.Page("pages/registro.py", title="Registro")
+    ])
 
-
-if st.button("Registrar"):
-    st.Page("pages/register.py")
+pageManager.run()
