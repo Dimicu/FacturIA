@@ -31,7 +31,7 @@ class SupabaseDB:
         # Initialize Supabase client
         self.supabase: Client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
 
-    #Metodos CRUD tabla facturas
+    # Metodos CRUD tabla facturas
     async def insertar_factura(self, data: dict):
 
         self.supabase.table("facturas").insert({"datos_factura": data}).execute()
@@ -51,9 +51,7 @@ class SupabaseDB:
         return response
 
     # Metodos tabla de costes
-    def coste_guardar_fact_tabla(
-        self, modelo,total_tokens, cost
-    ):
+    def coste_guardar_fact_tabla(self, modelo, total_tokens, cost):
         data = {
             "model": modelo,
             "total_tokens": total_tokens,
@@ -61,20 +59,17 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
-#Metodos subida de imagenes
-    async def sp_subir_imagen_factura(self, file_data, filename,content_type):
+    # Metodos subida de imagenes
+    async def sp_subir_imagen_factura(self, file_data, filename, content_type):
         """Sube una factura a Supabase Storage."""
         # Subir archivo a Supabase Storage
         response = self.supabase.storage.from_("imagenes_facturas").upload(
             path=filename,  # Se guarda con el mismo nombre del archivo
             file=file_data,
-            file_options={"content-type": content_type}  # Mantener el tipo de archivo
+            file_options={"content-type": content_type},  # Mantener el tipo de archivo
         )
 
-
-
-
-    #Metodos CRUD usuarios
+    # Metodos CRUD usuarios
     def registrar_usuario(self, email: str, password: str):
         try:
 

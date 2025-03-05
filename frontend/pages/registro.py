@@ -3,13 +3,10 @@ import sys
 import os
 import time
 import re
+import requests
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from backend.controller.controller import registro
-from utils.throw_json_error import (
-    throw_json_error,
-)
 
 
 def validar_email(email: str) -> bool:
@@ -39,7 +36,9 @@ def register_page():
             status_code = 0
 
             try:
-                response_register = registro(user_data)
+                response_register = requests.post(
+                    "http://127.0.0.1:8000/registro", json=user_data
+                ).json()
 
                 error_message = response_register["error"]
                 status_code = response_register["status_code"]
