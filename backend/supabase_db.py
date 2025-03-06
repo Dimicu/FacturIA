@@ -28,9 +28,11 @@ class SupabaseDB:
         self.supabase: Client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
 
     # Metodos CRUD tabla facturas
-    async def insertar_factura(self, data: dict):
+    async def insertar_factura(self, data: dict, id=1):
 
-        self.supabase.table("facturas").insert({"datos_factura": data}).execute()
+        self.supabase.table("facturas").insert(
+            {"datos_factura": data, "id_users": id}
+        ).execute()
 
     def actualizar_factura(self, email: str, updates: dict):
 
@@ -39,11 +41,13 @@ class SupabaseDB:
         )
         return response
 
-    def obtener_factura(self, email: str):
+    def factura_db_supabase(self, id: str):
 
         response = (
-            self.supabase.table("facturas").select("*").eq("email", email).execute()
+            self.supabase.table("facturas").select("*").eq("id_factura", id).execute()
         )
+
+        print("responsefromSupabase")
         return response
 
     # Metodos tabla de costes

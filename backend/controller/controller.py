@@ -8,6 +8,7 @@ from starlette.responses import JSONResponse
 
 from backend.model.modelos import Usuario
 from backend.services.services_usuario import services_user
+from backend.services.services_facturas import services_factura
 from fastapi import APIRouter, UploadFile, File
 
 import backend.services.services_facturas.services_factura
@@ -80,8 +81,15 @@ async def guardar_fact_completa(file: UploadFile = File(...)):
     # Enviar la respuesta de la API a la base de datos añadiendo un campo de nombre para la imagen
     respuesta_api["nombre_imagen"] = nombre_imagen
     await backend.services.services_facturas.services_factura.serv_guardar_datos_factura_json(
-        respuesta_api
+        respuesta_api, id=1
     )
     await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
         content, nombre_imagen, file.content_type
     )
+
+
+@router.get("/facturas/{id}")
+def factura_db_controller(id):
+    response = services_factura.factura_db_services(id)
+    print("reponsefromController")
+    return response
