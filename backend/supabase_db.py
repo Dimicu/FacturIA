@@ -1,15 +1,11 @@
-import json
 import os
-from http.client import HTTPException
 
 import bcrypt
-import requests
 from dotenv import load_dotenv
 
 # from multipart import file_path
-from starlette.datastructures import UploadFile
 from supabase import create_client, Client
-from utils.throw_json_error import throw_json_error
+from backend.utils.throw_json_error import throw_json_error
 
 
 class SupabaseDB:

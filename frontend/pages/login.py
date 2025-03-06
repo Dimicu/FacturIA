@@ -5,9 +5,6 @@ import time
 import requests
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from backend.controller.controller import login
-
-# from backend.controller.controller import registro
 
 
 def login_page():
@@ -37,7 +34,7 @@ def login_page():
             user_data = {"email": email, "password": password}
 
             response = requests.post(
-                "http://127.0.0.1:8000/login", json=user_data
+                "https://facturia-backend-48606537894.us-central1.run.app/login", json=user_data
             ).json()
 
             error_message = ""
