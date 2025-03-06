@@ -7,9 +7,6 @@ import re
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from backend.controller.controller import registro
-from utils.throw_json_error import (
-    throw_json_error,
-)
 
 
 def validar_email(email: str) -> bool:
