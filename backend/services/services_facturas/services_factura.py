@@ -110,6 +110,19 @@ async def serv_subir_imagen_factura(filedata, file, filename):
     db = SupabaseDB()
     await db.sp_subir_imagen_factura(filedata, file, filename)
 
+def serv_tomar_imagen_storage(nombre_imagen):
+    try:
+        db = SupabaseDB()
+        imagen_url = db.sp_tomar_imagen_storage(nombre_imagen)
+
+        if not imagen_url:
+            return None  # Se manejará en el controller con un 404
+        return imagen_url
+
+    except Exception as e:
+        print(f"Error en serv_tomar_imagen_storage: {str(e)}")
+        return None
+
 def procesar_factura():
 
 
