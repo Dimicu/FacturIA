@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 # from multipart import file_path
 from supabase import create_client, Client
+from websockets.headers import parse_extension_item
+
 from backend.utils.throw_json_error import throw_json_error
 
 
@@ -55,7 +57,7 @@ class SupabaseDB:
         }
         self.supabase.table("openai_requests").insert(data).execute()
 
-    # Metodos subida de imagenes
+    # Metodos de imagenes
     async def sp_subir_imagen_factura(self, file_data, filename, content_type):
         """Sube una factura a Supabase Storage."""
         # Subir archivo a Supabase Storage
@@ -64,6 +66,22 @@ class SupabaseDB:
             file=file_data,
             file_options={"content-type": content_type},  # Mantener el tipo de archivo
         )
+
+    def sp_tomar_imagen_storage(self, nombre_imagen):
+        try:
+            signed_url_data = self.supabase.storage.from_("imagenes_facturas").create_signed_url(nombre_imagen,expires_in=3600 * 8)
+
+            if not signed_url_data or "signedURL" not in signed_url_data:
+                print(f"Imagen '{nombre_imagen}' no encontrada en Supabase.")
+                return None  # Se manejará en el servicio y el controller
+
+            signed_url = signed_url_data["signedURL"]
+            print(signed_url)
+            return signed_url
+
+        except Exception as e:
+            print(f"Error en Supabase: {str(e)}")
+            return None
 
     # Metodos CRUD usuarios
     def registrar_usuario(self, email: str, password: str):
