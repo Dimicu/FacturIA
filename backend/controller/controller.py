@@ -1,18 +1,23 @@
 import io
 import uuid
-from http.client import HTTPResponse, HTTPConnection
+from http.client import HTTPResponse, HTTPConnection, HTTPException
 
 from PIL.Image import Image
 from fastapi import APIRouter
 from starlette.responses import JSONResponse
 
+from backend.supabase_db import SupabaseDB
 from backend.model.modelos import Usuario
 from backend.services.services_usuario import services_user
 from backend.services.services_facturas import services_factura
 from fastapi import APIRouter, UploadFile, File
+import streamlit as st
+
 
 import backend.services.services_facturas.services_factura
 
+
+db = SupabaseDB()
 router = APIRouter()
 
 
@@ -63,7 +68,10 @@ async def guardar_fact_storage(file: UploadFile = File(...)):
 
 
 @router.post("/facturas/completo")
-async def guardar_fact_completa(file: UploadFile = File(...)):
+async def guardar_fact_completa(file: UploadFile = File(...), email=str):
+
+    users_id = db.obtener_users_id_por_email(email)
+
     # Se crea nombre de archivo unico
     nombre_imagen = f"{uuid.uuid4()}_{file.filename}"
     # Leer el contenido de bytes de la imagen
@@ -80,16 +88,15 @@ async def guardar_fact_completa(file: UploadFile = File(...)):
     )
     # Enviar la respuesta de la API a la base de datos añadiendo un campo de nombre para la imagen
     respuesta_api["nombre_imagen"] = nombre_imagen
-    await backend.services.services_facturas.services_factura.serv_guardar_datos_factura_json(
-        respuesta_api, id=1
-    )
+    await services_factura.serv_guardar_datos_factura_json(respuesta_api, users_id)
     await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
         content, nombre_imagen, file.content_type
     )
+    return {"message": "Factura guardada correctamente"}
 
 
-@router.get("/facturas/{id}")
-def factura_db_controller(id):
-    response = services_factura.factura_db_services(id)
+@router.get("/facturas/{email}")
+def factura_db_controller(email):
+    response = services_factura.factura_db_services(email)
     print("reponsefromController")
     return response

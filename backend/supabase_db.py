@@ -28,11 +28,18 @@ class SupabaseDB:
         self.supabase: Client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
 
     # Metodos CRUD tabla facturas
-    async def insertar_factura(self, data: dict, id=1):
+    async def insertar_factura_db(self, data: dict, id):
 
-        self.supabase.table("facturas").insert(
-            {"datos_factura": data, "id_users": id}
-        ).execute()
+        response = (
+            self.supabase.table("facturas")
+            .insert({"datos_factura": data, "users_id": id})
+            .execute()
+        )
+
+        if response.data == 201:
+            return "Factura guardada con éxito"
+        elif response.data == 400:
+            return throw_json_error("Error en los datos proporcionado", 400)
 
     def actualizar_factura(self, email: str, updates: dict):
 
@@ -183,3 +190,12 @@ class SupabaseDB:
             }
         else:
             return {"error": "No se pudo eliminar el usuario"}
+
+    def obtener_users_id_por_email(self, email):
+        response = (
+            self.supabase.table("users").select("id").eq("email", email).execute()
+        )
+        if not response.data:
+            return {"message": f"El {email} no existe, debes registarte"}
+
+        return response.data[0]["id"]

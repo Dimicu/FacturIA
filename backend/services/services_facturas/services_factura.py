@@ -90,7 +90,8 @@ async def serv_guardar_datos_factura_json(datos_json, id=1):
     :return:
     """
     db = SupabaseDB()
-    await db.insertar_factura(datos_json, id)
+    await db.insertar_factura_db(datos_json, id)
+    print("servicesGuardarFacturaDB")
 
 
 def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
