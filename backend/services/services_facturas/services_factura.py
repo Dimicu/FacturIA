@@ -188,8 +188,8 @@ def leer_archivo_txt(ruta_instrucciones="jsons_plantilla_modelo/instrucciones.tx
     return instrucciones
 
 
-def factura_db_services(id):
+def factura_db_services(email):
     db = SupabaseDB()
-    response = db.factura_db_supabase(id)
+    response = db.factura_db_supabase(email)
     print("resposefromservices")
     return response

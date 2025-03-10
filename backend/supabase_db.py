@@ -48,13 +48,24 @@ class SupabaseDB:
         )
         return response
 
-    def factura_db_supabase(self, id: str):
+    def factura_db_supabase(self, email: str):
 
-        response = (
-            self.supabase.table("facturas").select("*").eq("id_factura", id).execute()
+        user_response = (
+            self.supabase.table("users").select("id").eq("email", email).execute()
         )
 
-        print("responsefromSupabase")
+        if not user_response.data:
+            return {"error": "User not found"}
+
+        user_id = user_response.data[0]["id"]
+
+        response = (
+            self.supabase.table("facturas")
+            .select("id_factura, datos_factura, nombre_imagen")
+            .filter("users_id", "eq", user_id)
+            .execute()
+        )
+
         return response
 
     # Metodos tabla de costes
