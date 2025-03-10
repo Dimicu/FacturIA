@@ -29,7 +29,7 @@ pytesseract.pytesseract.tesseract_cmd = (
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
-
+db = SupabaseDB()
 app = FastAPI()
 
 
@@ -75,13 +75,13 @@ def srv_interpretar_factura(texto_factura):
     print(respuesta_JSON_estructurado)
     return respuesta_JSON_estructurado
 
-async def serv_guardar_datos_factura_json(datos_json):
+async def serv_guardar_datos_factura_json(datos_json, id):
     """
     Guarda los datos de la factura en json en la base de datos
     :param datos_json:
     :return:
     """
-    db = SupabaseDB()
+
     await db.insertar_factura_db(datos_json, id)
     print("servicesGuardarFacturaDB")
 
@@ -94,7 +94,7 @@ def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
     :param tokens_cost:
     :return:
     """
-    db = SupabaseDB()
+
     db.coste_guardar_fact_tabla(modelo, tokens, tokens_cost)
 
 
@@ -106,60 +106,21 @@ async def serv_subir_imagen_factura(filedata, file, filename):
     :param filename:
     :return:
     """
-    db = SupabaseDB()
+
     await db.sp_subir_imagen_factura(filedata, file, filename)
 
 def serv_tomar_imagen_storage(nombre_imagen):
     try:
-        db = SupabaseDB()
-        imagen_url = db.sp_tomar_imagen_storage(nombre_imagen)
+        url_imagen = db.sp_tomar_imagen_storage(nombre_imagen)
 
-        if not imagen_url:
+        if not url_imagen:
             return None  # Se manejará en el controller con un 404
-        return imagen_url
+        return url_imagen
 
     except Exception as e:
         print(f"Error en serv_tomar_imagen_storage: {str(e)}")
         return None
 
-def procesar_factura():
-
-    datos_factura = extraer_texto()
-    with open("backend/jsons_plantilla_modelo/instrucciones.txt", "r") as instrucciones:
-        contexto2 = instrucciones.read()
-
-
-    contexto = (
-        "Estás ayudando a organizar información extraída de una factura, haciendo que sea fácilmente interpretable y procesable en formato JSON. "
-        "Recibes los datos desde una imagen escaneada mediante OCR por la libreria tesseract de python. "
-        "Organiza la información extraída de una factura en un formato JSON estructurado. "
-        "El JSON debe incluir campos como el emisor, destinatario, productos, cantidades, precios, impuestos y totales o sus equivalentes en cada factura específica. "
-        f"Te paso un ejemplo de otra factura para que tomes contexto de como debes aplicar el formato: {estructurar_datos()}"
-    )
-
-    datos_factura_limpios = modelo.limpiar_prompt(datos_factura)
-    datos_factura_mas_ordenes = f"Ahora genera SOLO el JSON, no añadas una respuesta de texto introductoria o final {datos_factura_limpios}"
-    prompt = modelo.agregar_contexto(contexto2, datos_factura_mas_ordenes)
-
-    json_generado = modelo.generar_json(prompt)
-    return {"resultado": json_generado}
-
-
-def extraer_texto():
-    # ruta = "ejemplos_facturas/factura_ejemplo_diego.jpeg"
-    # ruta = "ejemplos_facturas/factura_simplificada1 - copia.jpeg"
-    ruta = "backend/ejemplos_facturas/factura_simplificada1 - copia.jpeg"
-
-    ruta5 = f"ejemplos_facturas/factura_ejemplo5.webp"
-    imagen = Image.open(ruta)
-    custom_config = r"--psm 3 --oem 1"
-
-
-    texto_extraido = pytesseract.image_to_string(imagen, config=custom_config , lang="spa")
-
-    print(texto_extraido)
-
-    return texto_extraido
 
 async def extraer_texto_imagen_subida(content:bytes):
 
@@ -170,25 +131,10 @@ async def extraer_texto_imagen_subida(content:bytes):
 
     return texto_extraido
 
-def estructurar_datos():
-    ruta_json_ejemplo = "backend/jsons_plantilla_modelo/ejemplo_factura.json"
-
-    with open(ruta_json_ejemplo, "r", encoding="utf-8") as archivo_json:
-        ejemplo_datos = json.load(archivo_json)
-    return {json.dumps(ejemplo_datos, ensure_ascii=False, indent=4)}
-
-def leer_archivo_txt(ruta_instrucciones = "jsons_plantilla_modelo/instrucciones.txt"):
-
-    # Ejemplo de ruta
-    # ruta_instrucciones = "jsons_plantilla_modelo/instrucciones.txt"
-
-    with open(ruta_instrucciones,"r",encoding="utf-8") as archivo:
-        instrucciones = archivo.read()
-    return instrucciones
 
 
 def factura_db_services(email):
-    db = SupabaseDB()
+
     response = db.factura_db_supabase(email)
     print("resposefromservices")
     return response

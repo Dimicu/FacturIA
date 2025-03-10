@@ -47,11 +47,6 @@ async def eliminar_usuario_id(id: int):
     return "usuario eliminado"
 
 
-"""@router.post("/procesar-factura")
-async def procesar_factura():
-    backend.services.services_facturas.services_factura.procesar_factura()"""
-
-
 @router.post("/facturas/api/json")
 def extraer_json_formateado(texto):
    services_factura.srv_interpretar_factura(texto)
@@ -61,11 +56,11 @@ def extraer_json_formateado(texto):
 async def guardar_fact_storage(file: UploadFile = File(...)):
 
     content = await file.read()  # Leer el contenido del archivo
-    file_size = len(content)  # Obtener el tamaño del archivo correctamente
+    nombre_imagen = f"{uuid.uuid4()}_{file.filename}"
 
     await services_factura.serv_subir_imagen_factura(
-        content, file.filename, file.content_type
-    )  # Lee el archivo y pasa el nombre
+        content, nombre_imagen, file.content_type
+    )
 
 
 @router.post("/imagenes/{nombre_imagen}")
