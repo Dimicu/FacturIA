@@ -61,7 +61,7 @@ class SupabaseDB:
 
         response = (
             self.supabase.table("facturas")
-            .select("id_factura, datos_factura, nombre_imagen")
+            .select("id_factura, datos_factura, nombre_imagen ")
             .filter("users_id", "eq", user_id)
             .execute()
         )
