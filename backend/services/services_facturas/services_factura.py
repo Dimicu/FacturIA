@@ -3,8 +3,11 @@ import io
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-from langchain_community.callbacks import get_openai_callback  #Se instaló para llevar conteo de los tokens de las peticiones
+from langchain_community.callbacks import (
+    get_openai_callback,
+)  # Se instaló para llevar conteo de los tokens de las peticiones
 from sqlalchemy.dialects.postgresql import JSONB
+
 
 from backend.model.modelos import Factura
 from backend.supabase_db import SupabaseDB
@@ -17,15 +20,10 @@ from PIL import Image
 import pytesseract
 import platform
 
-if platform.system() == "Windows":
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-else:
-    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Ruta en Linux (Docker)
 
-try:
-    print("Tesseract version:", pytesseract.get_tesseract_version())
-except Exception as e:
-    print("Error al detectar Tesseract:", e)
+pytesseract.pytesseract.tesseract_cmd = (
+    r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+)
 
 
 load_dotenv()
@@ -73,7 +71,7 @@ def srv_interpretar_factura(texto_factura):
 
     serv_coste_guardar_fact_tabla(llm.model_name, total_tokens, total_cost)
     respuesta_JSON_Texto = factura_extraida.model_dump_json()
-    respuesta_JSON_estructurado = (json.loads(respuesta_JSON_Texto))
+    respuesta_JSON_estructurado = json.loads(respuesta_JSON_Texto)
     print(respuesta_JSON_estructurado)
     return respuesta_JSON_estructurado
 
@@ -83,8 +81,9 @@ async def serv_guardar_datos_factura_json(datos_json):
     :param datos_json:
     :return:
     """
-    db=SupabaseDB()
-    await db.insertar_factura(datos_json)
+    db = SupabaseDB()
+    await db.insertar_factura_db(datos_json, id)
+    print("servicesGuardarFacturaDB")
 
 
 def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
@@ -95,8 +94,8 @@ def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
     :param tokens_cost:
     :return:
     """
-    db= SupabaseDB()
-    db.coste_guardar_fact_tabla(modelo, tokens,tokens_cost)
+    db = SupabaseDB()
+    db.coste_guardar_fact_tabla(modelo, tokens, tokens_cost)
 
 
 async def serv_subir_imagen_factura(filedata, file, filename):
@@ -125,10 +124,9 @@ def serv_tomar_imagen_storage(nombre_imagen):
 
 def procesar_factura():
 
-
     datos_factura = extraer_texto()
-    with open ("backend/jsons_plantilla_modelo/instrucciones.txt", "r") as instrucciones:
-        contexto2= instrucciones.read()
+    with open("backend/jsons_plantilla_modelo/instrucciones.txt", "r") as instrucciones:
+        contexto2 = instrucciones.read()
 
 
     contexto = (
@@ -148,13 +146,13 @@ def procesar_factura():
 
 
 def extraer_texto():
-    #ruta = "ejemplos_facturas/factura_ejemplo_diego.jpeg"
-    #ruta = "ejemplos_facturas/factura_simplificada1 - copia.jpeg"
+    # ruta = "ejemplos_facturas/factura_ejemplo_diego.jpeg"
+    # ruta = "ejemplos_facturas/factura_simplificada1 - copia.jpeg"
     ruta = "backend/ejemplos_facturas/factura_simplificada1 - copia.jpeg"
 
     ruta5 = f"ejemplos_facturas/factura_ejemplo5.webp"
     imagen = Image.open(ruta)
-    custom_config = r'--psm 3 --oem 1'
+    custom_config = r"--psm 3 --oem 1"
 
 
     texto_extraido = pytesseract.image_to_string(imagen, config=custom_config , lang="spa")
@@ -166,7 +164,7 @@ def extraer_texto():
 async def extraer_texto_imagen_subida(content:bytes):
 
     imagen = Image.open(io.BytesIO(content))
-    custom_config = r'--psm 3 --oem 1'
+    custom_config = r"--psm 3 --oem 1"
 
     texto_extraido = pytesseract.image_to_string(imagen, config=custom_config, lang="spa")
 
@@ -188,3 +186,9 @@ def leer_archivo_txt(ruta_instrucciones = "jsons_plantilla_modelo/instrucciones.
         instrucciones = archivo.read()
     return instrucciones
 
+
+def factura_db_services(email):
+    db = SupabaseDB()
+    response = db.factura_db_supabase(email)
+    print("resposefromservices")
+    return response
