@@ -92,8 +92,8 @@ async def guardar_fact_completa(file: UploadFile = File(...), email=str):
         )
     )
     # Enviar la respuesta de la API a la base de datos añadiendo un campo de nombre para la imagen
-    respuesta_api["nombre_imagen"] = nombre_imagen
-    await services_factura.serv_guardar_datos_factura_json(respuesta_api, users_id)
+    #respuesta_api["nombre_imagen"] = nombre_imagen
+    await services_factura.serv_guardar_datos_factura_json(respuesta_api, users_id, nombre_imagen)
     await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
         content, nombre_imagen, file.content_type
     )
@@ -103,5 +103,5 @@ async def guardar_fact_completa(file: UploadFile = File(...), email=str):
 @router.get("/facturas/{email}")
 def factura_db_controller(email):
     response = services_factura.factura_db_services(email)
-    print("reponsefromController")
+
     return response
