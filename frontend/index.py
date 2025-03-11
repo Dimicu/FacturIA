@@ -10,13 +10,14 @@ if "authenticated" not in st.session_state:
 # Si el usuario está autenticado, mostrar la MainPage
 if st.session_state.authenticated:
     pageManager = st.navigation([
-        st.Page("main.py", title="Principal", default=True)
+        st.Page("views/main/main.py", title="Mis facturas", default=True),
+        st.Page("views/main/anadir_facturas.py", title="Añadir facturas")
     ])
 else:
     pageManager = st.navigation([
-        st.Page("home.py", title="Inicio", default=True),
-        st.Page("pages/login.py", title="Login"),
-        st.Page("pages/registro.py", title="Registro")
+        st.Page("views/home/home.py", title="Inicio", default=True),
+        st.Page("views/home/login.py", title="Login"),
+        st.Page("views/home/registro.py", title="Registro")
     ])
 
 pageManager.run()

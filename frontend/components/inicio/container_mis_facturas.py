@@ -21,7 +21,6 @@ def add_bill_button_style(text):
     button_html = f'''
             {estilo_boton}
             <button class="my-bill-button">{text}</button>
-            
         '''
     return button_html
 
@@ -56,8 +55,7 @@ def factura_card(id, cliente, fecha, total):
     """
     return card_html
 
-
-def render_misfacturas():
+def misfacturas(self):
     factura_container = st.container(border=True)
     with factura_container:
         info_row = st.columns(2)
@@ -83,3 +81,36 @@ def render_misfacturas():
             st.markdown(factura_card("12345", "Cliente A", "2025-02-25", "500"), unsafe_allow_html=True)
             st.markdown(factura_card("12346", "Cliente B", "2025-02-24", "300"), unsafe_allow_html=True)
             st.markdown(factura_card("12347", "Cliente C", "2025-02-23", "700"), unsafe_allow_html=True)
+
+
+class misfacturasclass:
+    def misfacturas(self):
+        factura_container = st.container(border=True)
+        with factura_container:
+            info_row = st.columns(2)
+            bill_row = st.columns(1)
+
+            with info_row[0]:
+                st.title("Mis facturas")
+            with info_row[1]:
+                st.markdown(add_bill_button_style("+"), unsafe_allow_html=True)
+
+                st.markdown("""
+                    <script>
+                        const button = document.querySelector(".my-bill-button");
+                        button.addEventListener("click", function() {
+                            // Forzar un clic en el botón oculto de Streamlit
+                            window.parent.document.querySelector('button[title="Botón oculto"]').click();
+                        });
+                    </script>
+                    """, unsafe_allow_html=True)
+
+            with bill_row[0]:
+                st.markdown(factura_card_style(), unsafe_allow_html=True)
+                st.markdown(factura_card("12345", "Cliente A", "2025-02-25", "500"), unsafe_allow_html=True)
+                st.markdown(factura_card("12346", "Cliente B", "2025-02-24", "300"), unsafe_allow_html=True)
+                st.markdown(factura_card("12347", "Cliente C", "2025-02-23", "700"), unsafe_allow_html=True)
+
+
+# class container:
+#     render_misfacturas()

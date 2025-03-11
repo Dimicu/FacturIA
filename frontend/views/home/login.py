@@ -60,12 +60,14 @@ def login_page():
 
             elif status_code == 400:
                 st.error(f"Error: {error_message}")
-            # elif status_code == 404:
-            #     st.error(f"Error: {error_message}")
-            #     st.button("Registrarse")
-            #
-            #     response_register = registro(user_data)
-            #     print(response_register)
+            # elif status_code == 0:
+            #     st.warning("Por favor, ingresa tu correo y contraseña.")
+            # # elif status_code == 404:
+            # #     st.error(f"Error: {error_message}")
+            # #     st.button("Registrarse")
+            # #
+            # #     response_register = registro(user_data)
+            # #     print(response_register)
 
             else:
                 st.error(f"Error desconocido: {error_message}")
