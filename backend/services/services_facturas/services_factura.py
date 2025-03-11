@@ -75,14 +75,14 @@ def srv_interpretar_factura(texto_factura):
     print(respuesta_JSON_estructurado)
     return respuesta_JSON_estructurado
 
-async def serv_guardar_datos_factura_json(datos_json, id):
+async def serv_guardar_datos_factura_json(datos_json, id, nombre_imagen):
     """
     Guarda los datos de la factura en json en la base de datos
     :param datos_json:
     :return:
     """
 
-    await db.insertar_factura_db(datos_json, id)
+    await db.insertar_factura_db(datos_json, id, nombre_imagen)
     print("servicesGuardarFacturaDB")
 
 
@@ -134,7 +134,16 @@ async def extraer_texto_imagen_subida(content:bytes):
 
 
 def factura_db_services(email):
-
+    """
+    Hace la consulta a base de datos de las facturas que hay asociadas a un email o id para luego traer la consulta entera de base de datos
+    y llamar a la función que empareja nombre de imagen con url del storage.
+    :param email:
+    :return: formato de datos con lo necesario para el frontend
+    """
     response = db.factura_db_supabase(email)
-    print("resposefromservices")
+
+    for factura in response.data:
+        url= db.sp_tomar_imagen_storage(factura["nombre_imagen"])
+        factura["url"] = url
+
     return response

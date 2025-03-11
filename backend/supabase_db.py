@@ -30,11 +30,11 @@ class SupabaseDB:
         self.supabase: Client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
 
     # Metodos CRUD tabla facturas
-    async def insertar_factura_db(self, data: dict, id):
+    async def insertar_factura_db(self, data: dict, id , nombre_imagen):
 
         response = (
             self.supabase.table("facturas")
-            .insert({"datos_factura": data, "users_id": id})
+            .insert({"datos_factura": data, "users_id": id, "nombre_imagen":nombre_imagen})
             .execute()
         )
 
@@ -63,7 +63,7 @@ class SupabaseDB:
 
         response = (
             self.supabase.table("facturas")
-            .select("id_factura, datos_factura, nombre_imagen ")
+            .select("id_factura, datos_factura, nombre_imagen")
             .filter("users_id", "eq", user_id)
             .execute()
         )
@@ -98,7 +98,6 @@ class SupabaseDB:
                 return None  # Se manejará en el servicio y el controller
 
             signed_url = signed_url_data["signedURL"]
-            print(signed_url)
             return signed_url
 
         except Exception as e:
