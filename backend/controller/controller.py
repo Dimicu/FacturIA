@@ -104,5 +104,4 @@ async def guardar_fact_completa(
 @router.get("/facturas/{email}")
 def factura_db_controller(email):
     response = services_factura.factura_db_services(email)
-    print(response.data[3]["url"])
     return response
