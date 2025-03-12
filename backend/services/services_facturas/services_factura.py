@@ -1,4 +1,3 @@
-
 import io
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -35,8 +34,11 @@ app = FastAPI()
 
 def srv_interpretar_factura(texto_factura):
     parser = PydanticOutputParser(pydantic_object=Factura)
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """
             Eres un asistente experto en facturación, especializado en la extracción de datos de facturas. 
             Ten en cuenta las siguientes recomendaciones :
             - Identificación del tipo de factura: 
@@ -52,9 +54,14 @@ def srv_interpretar_factura(texto_factura):
                 - Inversión del sujeto pasivo (Ejemplo: "artículo 84.Uno.2º LIVA").
                 - Régimen especial (Ejemplo: agencias de viajes o bienes usados).
             -MUY IMPORTANTE: si algun dato no está presente puedes darle el valor de cadena vacia "", no lo inventes
-        """),
-        ("human", "Extrae la información de la siguiente factura:\n\n{query}\n\n{format_instructions}"),
-    ]).partial(format_instructions=parser.get_format_instructions())
+        """,
+            ),
+            (
+                "human",
+                "Extrae la información de la siguiente factura:\n\n{query}\n\n{format_instructions}",
+            ),
+        ]
+    ).partial(format_instructions=parser.get_format_instructions())
 
     llm = ChatOpenAI(model="gpt-4-turbo", temperature=0)
 
@@ -75,14 +82,15 @@ def srv_interpretar_factura(texto_factura):
     print(respuesta_JSON_estructurado)
     return respuesta_JSON_estructurado
 
-async def serv_guardar_datos_factura_json(datos_json, id, nombre_imagen):
+
+async def serv_guardar_datos_factura_json(datos_json, id, nombre_imagen, tipo_factura):
     """
     Guarda los datos de la factura en json en la base de datos
     :param datos_json:
     :return:
     """
 
-    await db.insertar_factura_db(datos_json, id, nombre_imagen)
+    await db.insertar_factura_db(datos_json, id, nombre_imagen, tipo_factura)
     print("servicesGuardarFacturaDB")
 
 
@@ -109,6 +117,7 @@ async def serv_subir_imagen_factura(filedata, file, filename):
 
     await db.sp_subir_imagen_factura(filedata, file, filename)
 
+
 def serv_tomar_imagen_storage(nombre_imagen):
     try:
         url_imagen = db.sp_tomar_imagen_storage(nombre_imagen)
@@ -122,15 +131,16 @@ def serv_tomar_imagen_storage(nombre_imagen):
         return None
 
 
-async def extraer_texto_imagen_subida(content:bytes):
+async def extraer_texto_imagen_subida(content: bytes):
 
     imagen = Image.open(io.BytesIO(content))
     custom_config = r"--psm 3 --oem 1"
 
-    texto_extraido = pytesseract.image_to_string(imagen, config=custom_config, lang="spa")
+    texto_extraido = pytesseract.image_to_string(
+        imagen, config=custom_config, lang="spa"
+    )
 
     return texto_extraido
-
 
 
 def factura_db_services(email):
@@ -143,7 +153,7 @@ def factura_db_services(email):
     response = db.factura_db_supabase(email)
 
     for factura in response.data:
-        url= db.sp_tomar_imagen_storage(factura["nombre_imagen"])
+        url = db.sp_tomar_imagen_storage(factura["nombre_imagen"])
         factura["url"] = url
 
     return response
