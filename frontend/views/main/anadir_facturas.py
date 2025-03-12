@@ -11,7 +11,7 @@ st.radio(
     ["Venta", "Compra"],
     key="tipo_factura",
     horizontal=True,
-    index=None,
+    index=None
 )
 if "tipo_factura" in st.session_state:
     flag_factura = True
@@ -19,7 +19,6 @@ if "tipo_factura" in st.session_state:
 
 
 uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
-
 
 if uploaded_file is not None:
     flag_image = True

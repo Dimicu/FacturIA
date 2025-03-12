@@ -13,15 +13,6 @@ def login_page():
     if st.session_state.get("logged_in", False):
         st.session_state.authenticated = True
         st.rerun()
-        # st.success(f"Ya has iniciado sesión como {st.session_state['email']}")
-        # st.button("Crear factura")
-        # st.button("Actualizar factura")
-
-        # if st.button("Cerrar sesión"):
-        #     st.session_state["logged_in"] = False
-        #     st.session_state["email"] = ""
-        #     st.rerun()
-        # return
 
     email = st.text_input("Correo electrónico")
     password = st.text_input("Contraseña", type="password")
