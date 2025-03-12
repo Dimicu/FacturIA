@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 from websockets.headers import parse_extension_item
 
+from backend.model.modelos import UsuarioFinanciero
 from backend.utils.throw_json_error import throw_json_error
 
 
@@ -139,7 +140,23 @@ class SupabaseDB:
                     )
                     .execute()
                 )
+
                 if respuesta_insertar.data:
+                    usuario_id = respuesta_insertar.data[0]["id"]  # Obtener ID del usuario creado
+                    usu_finan = UsuarioFinanciero()
+                    # Crear usuario financiero asociado
+                    respuesta_financiero = (
+                        self.supabase.table("usuario_financiero")
+                        .insert(
+                            {
+                                "usr_finan_id": usuario_id,
+                                "balance_fact": usu_finan.balance_fact,
+                                "ingresos_fact": usu_finan.ingresos_fact,
+                                "gastos_fact": usu_finan.gastos_fact,
+                            }
+                        )
+                        .execute()
+                    )
 
                     return throw_json_error(
                         f"Usuario registrado correctamente con el correo {email}", 201
@@ -227,3 +244,4 @@ class SupabaseDB:
             return {"message": f"El {email} no existe, debes registarte"}
 
         return response.data[0]["id"]
+
