@@ -7,5 +7,5 @@ from components.main.logout import logout
 
 economiaclass().render_economia()
 misfacturasclass().misfacturas()
-logout().logoutbutton()
+
 

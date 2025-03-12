@@ -1,28 +1,6 @@
 import streamlit as st
-
-
-def add_bill_button_style(text):
-    estilo_boton = """<style>
-                .my-bill-button {
-                    font-size: 30px;
-                    border: none;
-                    border-radius: 50%;
-                    padding: 0px 15px;
-                    margin-top: 20px;
-                    float: right;
-                    margin-right: 20px;
-                    transition: background-color 0.3s ease;
-                }
-                .my-bill-button:hover {
-                    background-color: #dcdde0;
-                }
-            </style>"""
-
-    button_html = f'''
-            {estilo_boton}
-            <button class="my-bill-button">{text}</button>
-        '''
-    return button_html
+import requests
+from streamlit import session_state
 
 
 def factura_card_style():
@@ -34,10 +12,22 @@ def factura_card_style():
             padding: 20px;
             margin-bottom: 20px;
             background-color: #f9f9f9;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .factura-card:hover {
+            background-color: #f1f1f1;
         }
         .factura-card p {
             font-size: 16px;
             margin: 5px 0;
+            color: black; /* Asegura que el texto no sea azul */
+        }
+        /* Asegura que el enlace no esté subrayado */
+        .factura-link {
+            text-decoration: none !important;  /* Añadir !important para sobrescribir cualquier otro estilo */
+            color: inherit !important;         /* Asegura que el color no sea azul */
+            display: block;                    /* Hace que el enlace abarque toda la tarjeta */
         }
     </style>
     """
@@ -45,72 +35,45 @@ def factura_card_style():
 
 
 def factura_card(id, cliente, fecha, total):
+    factura_url = f"/factura_detalle?id={id}"  # URL de destino
     card_html = f"""
-    <div class="factura-card">
-        <p><strong>ID de Factura:</strong> {id}</p>
-        <p><strong>Cliente:</strong> {cliente}</p>
-        <p><strong>Fecha:</strong> {fecha}</p>
-        <p><strong>Total:</strong> {total} EUR</p>
-    </div>
+    <a href="{factura_url}" class="factura-link">
+        <div class="factura-card">
+            <p><strong>ID de Factura:</strong> {id}</p>
+            <p><strong>Cliente:</strong> {cliente}</p>
+            <p><strong>Fecha:</strong> {fecha}</p>
+            <p><strong>Total:</strong> {total} EUR</p>
+        </div>
+    </a>
     """
     return card_html
-
-def misfacturas(self):
-    factura_container = st.container(border=True)
-    with factura_container:
-        info_row = st.columns(2)
-        bill_row = st.columns(1)
-
-        with info_row[0]:
-            st.title("Mis facturas")
-        with info_row[1]:
-            st.markdown(add_bill_button_style("+"), unsafe_allow_html=True)
-
-            st.markdown("""
-                <script>
-                    const button = document.querySelector(".my-bill-button");
-                    button.addEventListener("click", function() {
-                        // Forzar un clic en el botón oculto de Streamlit
-                        window.parent.document.querySelector('button[title="Botón oculto"]').click();
-                    });
-                </script>
-                """, unsafe_allow_html=True)
-
-        with bill_row[0]:
-            st.markdown(factura_card_style(), unsafe_allow_html=True)
-            st.markdown(factura_card("12345", "Cliente A", "2025-02-25", "500"), unsafe_allow_html=True)
-            st.markdown(factura_card("12346", "Cliente B", "2025-02-24", "300"), unsafe_allow_html=True)
-            st.markdown(factura_card("12347", "Cliente C", "2025-02-23", "700"), unsafe_allow_html=True)
 
 
 class misfacturasclass:
     def misfacturas(self):
         factura_container = st.container(border=True)
         with factura_container:
-            info_row = st.columns(2)
+            info_row = st.columns(1)
             bill_row = st.columns(1)
 
             with info_row[0]:
                 st.title("Mis facturas")
-            with info_row[1]:
-                st.markdown(add_bill_button_style("+"), unsafe_allow_html=True)
-
-                st.markdown("""
-                    <script>
-                        const button = document.querySelector(".my-bill-button");
-                        button.addEventListener("click", function() {
-                            // Forzar un clic en el botón oculto de Streamlit
-                            window.parent.document.querySelector('button[title="Botón oculto"]').click();
-                        });
-                    </script>
-                    """, unsafe_allow_html=True)
-
             with bill_row[0]:
-                st.markdown(factura_card_style(), unsafe_allow_html=True)
-                st.markdown(factura_card("12345", "Cliente A", "2025-02-25", "500"), unsafe_allow_html=True)
-                st.markdown(factura_card("12346", "Cliente B", "2025-02-24", "300"), unsafe_allow_html=True)
-                st.markdown(factura_card("12347", "Cliente C", "2025-02-23", "700"), unsafe_allow_html=True)
+                with st.spinner('Cargando tus facturas...'):
+                    st.markdown(factura_card_style(), unsafe_allow_html=True)
+                    response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}")
+                    data = response.json()
 
-
-# class container:
-#     render_misfacturas()
+                    if "data" in data:
+                        for factura in data["data"]:
+                            st.markdown(
+                                factura_card(
+                                    factura["id_factura"],
+                                    factura["datos_factura"]["receptor"]["nombre"],
+                                    factura["datos_factura"]["fecha_operacion"],
+                                    factura["datos_factura"]["totales"].get("total_factura", "No disponible")
+                                ),
+                                unsafe_allow_html=True
+                            )
+                    else:
+                        st.error("No se encontraron facturas o hubo un error al cargar los datos.")

@@ -1,5 +1,4 @@
 import streamlit as st
-from components.main.logout import logout
 
 flag_button = True
 flag_factura = False
@@ -26,5 +25,3 @@ if flag_image & flag_factura != False:
     flag_button = False
 
 st.button("Confirmar",disabled=flag_button)
-
-logout().logoutbutton()
