@@ -1,5 +1,4 @@
 import streamlit as st
-from components.main.logout import logout
 import requests
 import time
 
@@ -50,6 +49,3 @@ if st.button("Confirmar", disabled=flag_button):
 
     else:
         st.error(f"Hubo un error al procesar la factura: {response.text}")
-
-
-logout().logoutbutton()
