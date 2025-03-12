@@ -30,11 +30,18 @@ class SupabaseDB:
         self.supabase: Client = create_client(SUPABASE_URL, SERVICE_ROLE_KEY)
 
     # Metodos CRUD tabla facturas
-    async def insertar_factura_db(self, data: dict, id , nombre_imagen):
+    async def insertar_factura_db(self, data: dict, id, nombre_imagen, tipo_factura):
 
         response = (
             self.supabase.table("facturas")
-            .insert({"datos_factura": data, "users_id": id, "nombre_imagen":nombre_imagen})
+            .insert(
+                {
+                    "datos_factura": data,
+                    "users_id": id,
+                    "nombre_imagen": nombre_imagen,
+                    "tipo_de_factura": tipo_factura,
+                }
+            )
             .execute()
         )
 
@@ -91,7 +98,9 @@ class SupabaseDB:
 
     def sp_tomar_imagen_storage(self, nombre_imagen):
         try:
-            signed_url_data = self.supabase.storage.from_("imagenes_facturas").create_signed_url(nombre_imagen,expires_in=3600 * 8)
+            signed_url_data = self.supabase.storage.from_(
+                "imagenes_facturas"
+            ).create_signed_url(nombre_imagen, expires_in=3600 * 8)
 
             if not signed_url_data or "signedURL" not in signed_url_data:
                 print(f"Imagen '{nombre_imagen}' no encontrada en Supabase.")
