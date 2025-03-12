@@ -1,6 +1,7 @@
 import streamlit as st
 from components.main.logout import logout
 import requests
+import time
 
 flag_button = True
 flag_factura = False
@@ -28,16 +29,27 @@ if flag_image and flag_factura != False:
     flag_button = False
 
 if st.button("Confirmar", disabled=flag_button):
+    progreso = st.progress(10)
+    mensaje = st.empty()
+    mensaje.write("FacturIA subiendo y procesando la factura...")
+
     email = st.session_state.email
+
     files = {"file": uploaded_file}
     data = {"email": email, "tipo_factura": tipo_factura_seleccionado}
     response = requests.post(
         "http://127.0.0.1:8000/facturas/completo", files=files, data=data
     )
+    for i in range(1, 101):
+        time.sleep(0.02)
+        progreso.progress(i)
     if response.status_code == 200:
         st.success("Factura procesada correctamente.")
+        progreso.empty()
+        mensaje.empty()
+
     else:
         st.error(f"Hubo un error al procesar la factura: {response.text}")
 
 
-# logout().logoutbutton()
+logout().logoutbutton()
