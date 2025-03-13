@@ -1,4 +1,5 @@
 import streamlit as st
+from components.main.logout import logout
 
 # Configuración de la página
 st.set_page_config(page_title="FacturIA")
@@ -13,6 +14,7 @@ if st.session_state.authenticated:
         st.Page("views/main/main.py", title="Mis facturas", default=True),
         st.Page("views/main/anadir_facturas.py", title="Añadir facturas")
     ])
+    logout().logoutbutton()
 else:
     pageManager = st.navigation([
         st.Page("views/home/home.py", title="Inicio", default=True),
