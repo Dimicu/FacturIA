@@ -1,5 +1,7 @@
 
 import io
+from urllib.error import HTTPError
+
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -147,3 +149,33 @@ def factura_db_services(email):
         factura["url"] = url
 
     return response
+
+def serv_obtener_balance(id):
+    response = db.sp_obtener_balance(id)
+    print(response.data[0])
+    return response
+
+def serv_actualizar_balance(id,tipo_factura,total_monto):
+    try:
+        response = db.sp_obtener_balance(id)
+        datos_finan = response.data[0]
+        if datos_finan:
+
+            if tipo_factura == "Venta":
+                nuevos_ingresos = float(datos_finan["ingresos_fact"]) + float(total_monto)
+                nuevos_gastos = float(datos_finan["gastos_fact"])
+                nuevo_balance = nuevos_ingresos - nuevos_gastos
+            elif tipo_factura == "Compra":
+                nuevos_ingresos = float(datos_finan["ingresos_fact"])
+                nuevos_gastos = float(datos_finan["gastos_fact"]) + float(total_monto)
+                nuevo_balance = nuevos_ingresos - nuevos_gastos
+            else:
+                raise ValueError("No se puede indentificar el tipo de factura")
+        else:
+            raise ValueError("Usuario financiero no encontrado")
+
+        db.sp_actualizar_balance(id, nuevos_ingresos, nuevos_gastos, nuevo_balance)
+
+    except Exception as e:
+        print(f"Error al actualizar balance: {str(e)}")
+

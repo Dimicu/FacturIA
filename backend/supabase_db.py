@@ -2,6 +2,8 @@ import os
 
 import bcrypt
 from dotenv import load_dotenv
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm.sync import update
 
 # from multipart import file_path
 from supabase import create_client, Client
@@ -140,16 +142,17 @@ class SupabaseDB:
                     )
                     .execute()
                 )
-
+                print(respuesta_insertar.data[0]["id"])
                 if respuesta_insertar.data:
                     usuario_id = respuesta_insertar.data[0]["id"]  # Obtener ID del usuario creado
-                    usu_finan = UsuarioFinanciero()
+                    usu_finan = UsuarioFinanciero(usr_finan_id=usuario_id, ingresos_fact=0.0, gastos_fact=0.0 ,balance_fact=0.0)
+
                     # Crear usuario financiero asociado
                     respuesta_financiero = (
                         self.supabase.table("usuario_financiero")
                         .insert(
                             {
-                                "usr_finan_id": usuario_id,
+                                "usr_finan_id": usu_finan.usr_finan_id,
                                 "balance_fact": usu_finan.balance_fact,
                                 "ingresos_fact": usu_finan.ingresos_fact,
                                 "gastos_fact": usu_finan.gastos_fact,
@@ -245,3 +248,12 @@ class SupabaseDB:
 
         return response.data[0]["id"]
 
+    def sp_obtener_balance(self, id):
+        response = self.supabase.table("usuario_financiero").select("*").eq("usr_finan_id", id).execute()
+        return response
+
+    def sp_actualizar_balance(self, id,ingresos_fact,gastos_fact, balance_fact):
+        response =  self.supabase.table("usuario_financiero").update(
+            {"balance_fact": balance_fact,"ingresos_fact": ingresos_fact,"gastos_fact": gastos_fact,}
+        ).eq("usr_finan_id", id).execute()
+        return response

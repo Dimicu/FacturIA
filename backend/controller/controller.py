@@ -4,6 +4,7 @@ from http.client import HTTPResponse, HTTPConnection, HTTPException
 
 from PIL.Image import Image
 from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse
 
 from backend.supabase_db import SupabaseDB
@@ -105,3 +106,14 @@ def factura_db_controller(email):
     response = services_factura.factura_db_services(email)
 
     return response
+
+@router.get("/facturas/balance/{id}")
+def obtener_factura_balance(id):
+    response= services_factura.serv_obtener_balance(id)
+    return jsonable_encoder(response.data)
+@router.put("/facturas/actualizacion/{id}")
+def actualizar_balance(id,tipo_factura, total):
+    try:
+        services_factura.serv_actualizar_balance(id, tipo_factura, total)
+    except Exception as e:
+        print(f"error: {e}")
