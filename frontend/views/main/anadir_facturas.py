@@ -11,7 +11,7 @@ st.radio(
     ["Venta", "Compra"],
     key="tipo_factura",
     horizontal=True,
-    index=None
+    index=None,
 )
 if "tipo_factura" in st.session_state:
     flag_factura = True
