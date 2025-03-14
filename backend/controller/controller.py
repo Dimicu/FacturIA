@@ -1,5 +1,6 @@
 import io
 import uuid
+import json
 from http.client import HTTPResponse, HTTPConnection, HTTPException
 
 from PIL.Image import Image
@@ -13,7 +14,7 @@ from backend.services.services_facturas import services_factura
 from backend.services.services_usuario import services_user
 from backend.services.services_facturas import services_factura
 from fastapi import APIRouter, UploadFile, File, Form, Body
-from fastapi.encoders import jsonable_encoder
+
 import streamlit as st
 
 
@@ -84,6 +85,8 @@ async def guardar_fact_completa(
     texto_extraido = await services_factura.extraer_texto_imagen_subida(content)
     respuesta_api = services_factura.srv_interpretar_factura(texto_extraido)
 
+    print("api", type(respuesta_api))
+
     return respuesta_api
 
 
@@ -92,15 +95,16 @@ async def guardar_bd_factura(
     email: str = Form(...),
     file: UploadFile = File(...),
     tipo_factura: str = Form(...),
-    json_front_modified: dict = Body(...),
+    json_front_modified: str = Form(...),
 ):
 
+    json_formateado = json.loads(json_front_modified)
     user_id = db.obtener_users_id_por_email(email)
     content_changed = await file.read()
     nombre_imagen = f"{uuid.uuid4()}_{file.filename}"
 
     await services_factura.serv_guardar_datos_factura_json(
-        json_front_modified, user_id, nombre_imagen, tipo_factura
+        json_formateado, user_id, nombre_imagen, tipo_factura
     )
     await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
         content_changed, nombre_imagen, file.content_type
