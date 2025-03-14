@@ -106,15 +106,18 @@ async def guardar_bd_factura(
     await services_factura.serv_guardar_datos_factura_json(
         json_formateado, user_id, nombre_imagen, tipo_factura
     )
+
     await backend.services.services_facturas.services_factura.serv_subir_imagen_factura(
         content_changed, nombre_imagen, file.content_type
     )
+
 
     return JSONResponse(
         status_code=200,
         content={
             "message": "Factura guardada correctamente",
             "Factura": {"Usuario": email, "Tipo de factura": tipo_factura},
+            "Balance" : "Su balance ha sido actualizado con exito"
         },
     )
 
@@ -131,6 +134,7 @@ def obtener_factura_balance(id):
 @router.put("/facturas/actualizacion/{id}")
 def actualizar_balance(id,tipo_factura, total):
     try:
-        services_factura.serv_actualizar_balance(id, tipo_factura, total)
+        response = services_factura.serv_actualizar_balance(id, tipo_factura, total)
     except Exception as e:
         print(f"error: {e}")
+    return jsonable_encoder(response)

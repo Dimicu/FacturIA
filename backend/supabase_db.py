@@ -48,10 +48,12 @@ class SupabaseDB:
             .execute()
         )
 
-        if response.data == 201:
-            return "Factura guardada con éxito"
-        elif response.data == 400:
-            return throw_json_error("Error en los datos proporcionado", 400)
+        if response.data:  # Si hay datos, la inserción fue exitosa
+            return {"success": True, "message": "Factura guardada con éxito", "data": response.data}
+        elif response.error:  # Si hay un error, devuelve el mensaje de error
+            return {"success": False, "error": response.error.message}
+
+        return {"success": False, "error": "Error desconocido al insertar la factura"}
 
     def actualizar_factura(self, email: str, updates: dict):
 
