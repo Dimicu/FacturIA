@@ -23,15 +23,12 @@ def login_page():
             st.warning("Por favor, ingresa tu correo y contraseña.")
         else:
             user_data = {"email": email, "password": password}
-
-            response = requests.post(
-                "https://facturia-backend-48606537894.us-central1.run.app/login", json=user_data
-            ).json()
-
             error_message = ""
             status_code = 0
-
             try:
+                response = requests.post(
+                    "http://127.0.0.1:8000/login", json=user_data
+                ).json()
 
                 error_message = response.get("error", "")
                 status_code = response.get("status_code", 0)

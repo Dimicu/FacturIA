@@ -1,14 +1,13 @@
-from backend.supabase_db import SupabaseDB
+from backend.all_supabase_db_connections import SupabaseDB_connection
 from fastapi import FastAPI
 from backend.model.modelos import Usuario
 
 
-db = SupabaseDB()
+db = SupabaseDB_connection()
 app = FastAPI()
 
 
 def login(usuario: dict):
-
     email = usuario.get("email", "").lower()
     password = usuario.get("password", "")
 
@@ -16,7 +15,7 @@ def login(usuario: dict):
     return response_login_o_registro
 
 
-def registro(usuario: dict):
+def registro_services(usuario: dict):
 
     email = usuario.get("email", "").lower()
     password = usuario.get("password", "")

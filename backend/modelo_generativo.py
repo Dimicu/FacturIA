@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from backend.supabase_db import SupabaseDB
+from backend.all_supabase_db_connections import SupabaseDB_connection
 
 
 class ModeloGPT:

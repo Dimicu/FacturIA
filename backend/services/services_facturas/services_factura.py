@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 
 from backend.model.modelos import Factura
-from backend.supabase_db import SupabaseDB
+from backend.all_supabase_db_connections import SupabaseDB_connection
 from fastapi import FastAPI, UploadFile
 from dotenv import load_dotenv
 from backend.modelo_generativo import ModeloGPT
@@ -28,7 +28,7 @@ pytesseract.pytesseract.tesseract_cmd = (
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
-db = SupabaseDB()
+db = SupabaseDB_connection()
 app = FastAPI()
 
 

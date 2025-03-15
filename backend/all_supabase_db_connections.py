@@ -1,16 +1,17 @@
 import os
-
+import logging
 import bcrypt
 from dotenv import load_dotenv
 
+
 # from multipart import file_path
 from supabase import create_client, Client
-from websockets.headers import parse_extension_item
+
 
 from backend.utils.throw_json_error import throw_json_error
 
 
-class SupabaseDB:
+class SupabaseDB_connection:
     def __init__(self):
         """Initialize the Supabase client with credentials from environment variables."""
 
@@ -236,3 +237,9 @@ class SupabaseDB:
             return {"message": f"El {email} no existe, debes registarte"}
 
         return response.data[0]["id"]
+
+    # metodos monitoreo
+    def insert_monitoring(self, table: str, data: dict):
+
+        response = self.supabase.table(table).insert(data).execute()
+        return response

@@ -1,40 +1,60 @@
 import io
 import uuid
 import json
+import logging
+from supabase import SupabaseException
 from http.client import HTTPResponse, HTTPConnection, HTTPException
 
 from PIL.Image import Image
 from fastapi import APIRouter, HTTPException
 from starlette.responses import JSONResponse
-
-from backend.supabase_db import SupabaseDB
+from monitoring.errores import errores_backend
+from backend.all_supabase_db_connections import SupabaseDB_connection
 from backend.model.modelos import Usuario
 from backend.services.services_facturas import services_factura
 from backend.services.services_usuario import services_user
 from backend.services.services_facturas import services_factura
-from fastapi import APIRouter, UploadFile, File, Form, Body
 
-import streamlit as st
+from fastapi import APIRouter, UploadFile, File, Form, Body
 
 
 import backend.services.services_facturas.services_factura
 
 
-db = SupabaseDB()
+db = SupabaseDB_connection()
 router = APIRouter()
+
+
+@router.get("/")
+def root():
+    return {"message": "Bienvenido a la API de FacturIA "}
 
 
 @router.post("/login")
 def login(usuario: Usuario):
-    response_login = services_user.login(dict(usuario))
-    return response_login
+    try:
+
+        # response_login = login(dict(usuario)) PRUEBA CAPTURAR ERROR MONITORING
+        response_login = services_user.login(dict(usuario))
+        return response_login
+
+    except Exception as e:
+
+        logging.error(f"Error en login_usuario con email {usuario.email}: {str(e)}")
+        errores_backend(endpoint="/login", error_message=str(e))
 
 
 @router.post("/registro")
 def registro(usuario: Usuario):
-    response_registro = services_user.registro(dict(usuario))
-    print("desde controller", response_registro)
-    return response_registro
+    try:
+
+        # response_registro = registro(str(usuario)) PRUEBA CAPTURAR ERROR MONITORING
+        response_registro = services_user.registro(dict(usuario))
+        return response_registro
+    except Exception as e:
+
+        logging.error(f"Error en registrar_usuario con email {usuario.email}: {str(e)}")
+        errores_backend(endpoint="/registro", error_message=str(e))
 
 
 @router.put("/usuarios")

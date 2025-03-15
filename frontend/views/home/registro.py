@@ -37,7 +37,8 @@ def register_page():
 
             try:
                 response_register = requests.post(
-                    "https://facturia-backend-48606537894.us-central1.run.app/registro", json=user_data
+                    "http://127.0.0.1:8000/registro",
+                    json=user_data,
                 ).json()
 
                 error_message = response_register["error"]
