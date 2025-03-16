@@ -63,8 +63,8 @@ class misfacturasclass:
                     st.markdown(factura_card_style(), unsafe_allow_html=True)
                     response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}")
                     data = response.json()
-
                     if "data" in data:
+                        st.write(data)
                         for factura in data["data"]:
                             st.markdown(
                                 factura_card(
