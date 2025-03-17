@@ -96,7 +96,7 @@ async def serv_guardar_datos_factura_json(datos_json, id, nombre_imagen, tipo_fa
     try:
 
             response_factura = await db.insertar_factura_db(datos_json, id, nombre_imagen, tipo_factura)
-            serv_actualizar_balance(id, tipo_factura, datos_json["totales"]["total_factura"])
+            serv_actualizar_balance(id, tipo_factura, datos_json["totales"]["total_con_iva"])
 
 
             return response_factura

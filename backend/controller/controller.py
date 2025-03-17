@@ -131,10 +131,11 @@ def factura_db_controller(email):
 def obtener_factura_balance(email):
     response= services_factura.serv_obtener_balance(email)
     return jsonable_encoder(response.data)
+"""
 @router.put("/facturas/actualizacion/{id}")
 def actualizar_balance(id,tipo_factura, total):
     try:
         response = services_factura.serv_actualizar_balance(id, tipo_factura, total)
     except Exception as e:
         print(f"error: {e}")
-    return jsonable_encoder(response)
+    return jsonable_encoder(response)"""
