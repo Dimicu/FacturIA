@@ -1,8 +1,5 @@
 import streamlit as st
 import requests
-from components.anadir_facturas.editar_facturas_dialog import edit_factura_dialog
-import json
-
 import time
 
 flag_button = True
@@ -41,11 +38,8 @@ if st.button("Confirmar", disabled=flag_button):
     files = {"file": uploaded_file}
     data = {"email": email, "tipo_factura": tipo_factura_seleccionado}
     response = requests.post(
-        "http://127.0.0.1:8000/facturas/completo", files=files, data=data
+        "http://127.0.0.1:8000/facturas/file", files=files, data=data
     )
-    # dataloaded = json.loads(response)
-    # st.session_state["edit_factura"] = dataloaded
-    # st.rerun()
 
     for i in range(1, 101):
         time.sleep(0.02)
@@ -54,6 +48,9 @@ if st.button("Confirmar", disabled=flag_button):
         st.success("Factura procesada correctamente.")
         progreso.empty()
         mensaje.empty()
+        st.session_state["edit_factura"] = response.json()
+        st.session_state["imagen_factura"] = uploaded_file
+        st.rerun()
 
     else:
         st.error(f"Hubo un error al procesar la factura: {response.text}")

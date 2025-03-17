@@ -7,6 +7,11 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "edit_factura" not in st.session_state:
     st.session_state["edit_factura"] = ""
+if "imagen_factura" not in st.session_state:
+    st.session_state["imagen_factura"] = ""
+if "tipo_factura" not in st.session_state:
+    st.session_state["tipo_factura"] = ""
+
 
 st.set_page_config(page_title="FacturIA",layout=st.session_state["layoutConfig"])
 
