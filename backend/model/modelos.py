@@ -39,9 +39,13 @@ class Item(BaseModel):
     descripcion: str = Field("", description="Descripción del producto o servicio")
     cantidad: int = Field(0, description="Cantidad comprada")
     precio_unitario: float = Field(0.0, description="Precio por unidad")
-    tipo_IVA: int = Field(0, description="Tipo de IVA aplicado")
+    tipo_IVA: float = Field(0.0, description="Tipo de IVA aplicado")
     cuota_IVA: float = Field(0.0, description="Cuota de IVA calculada")
 
+class Totales(BaseModel):
+    total_sin_iva: float = Field(0.0, description="Total de la factura sin IVA")
+    total_con_iva: float = Field(0.0, description="Total de la factura con IVA")
+    tipo_impositivo: float = Field(0.0, description="Porcentaje de IVA aplicado")
 
 class Factura(BaseModel):
     tipo_factura: Optional[str] = Field("", description="Tipo de factura")
@@ -60,7 +64,7 @@ class Factura(BaseModel):
     items: List[Item] = Field(
         [], description="Lista de productos o servicios incluidos en la factura"
     )
-    totales: dict = Field({}, description="Totales calculados de la factura")
+    totales: Totales = Field(Totales(), description="Totales calculados de la factura")
     menciones_especiales: List[str] = Field(
         [], description="Menciones especiales de la factura si aplica"
     )

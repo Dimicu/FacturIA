@@ -127,9 +127,9 @@ def factura_db_controller(email):
     response = services_factura.factura_db_services(email)
     return response
 
-@router.get("/facturas/balance/{id}")
-def obtener_factura_balance(id):
-    response= services_factura.serv_obtener_balance(id)
+@router.get("/facturas/balance/{email}")
+def obtener_factura_balance(email):
+    response= services_factura.serv_obtener_balance(email)
     return jsonable_encoder(response.data)
 @router.put("/facturas/actualizacion/{id}")
 def actualizar_balance(id,tipo_factura, total):

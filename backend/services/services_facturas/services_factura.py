@@ -169,7 +169,8 @@ def factura_db_services(email):
 
     return response
 
-def serv_obtener_balance(id):
+def serv_obtener_balance(email):
+    id = db.obtener_users_id_por_email(email)
     response = db.sp_obtener_balance(id)
     print(response.data[0])
     return response
