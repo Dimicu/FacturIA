@@ -170,10 +170,14 @@ def factura_db_services(email):
     return response
 
 def serv_obtener_balance(email):
-    id = db.obtener_users_id_por_email(email)
-    response = db.sp_obtener_balance(id)
-    print(response.data[0])
-    return response
+    try:
+        id = db.obtener_users_id_por_email(email)
+        response = db.sp_obtener_balance(id)
+        return response
+    except ValueError as ve:
+        raise ve  # Relanzamos errores esperados
+    except Exception as e:
+        raise RuntimeError("Error al obtener balance")  # Relanzamos con un mensaje genérico
 
 def serv_actualizar_balance(id,tipo_factura,total_monto):
     try:

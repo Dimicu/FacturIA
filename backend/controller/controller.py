@@ -129,8 +129,16 @@ def factura_db_controller(email):
 
 @router.get("/facturas/balance/{email}")
 def obtener_factura_balance(email):
-    response= services_factura.serv_obtener_balance(email)
-    return jsonable_encoder(response.data)
+    try:
+        response = services_factura.serv_obtener_balance(email)
+        return jsonable_encoder(response.data)
+    except HTTPException as http_exc:
+        # Si ya es una HTTPException, la relanzamos sin modificarla
+        raise http_exc
+    except Exception as e:
+        # Lanzar un error 500 sin exponer detalles internos
+        raise HTTPException(status_code=500, detail="Ocurrió un error inesperado. Inténtalo más tarde.")
+
 """
 @router.put("/facturas/actualizacion/{id}")
 def actualizar_balance(id,tipo_factura, total):
