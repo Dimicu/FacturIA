@@ -13,7 +13,7 @@ def calcular_total(items):
     return total
 
 
-def edit_factura_dialog(factura_data, factura_img, tipo_factura):
+def edit_factura(factura_data, factura_img, venta_compra):
     factura = factura_data
     items = factura_data["items"]
 
@@ -70,21 +70,21 @@ def edit_factura_dialog(factura_data, factura_img, tipo_factura):
                     "http://127.0.0.1:8000/facturas/completa",
                     data={
                         "email": st.session_state["email"],
-                        "tipo_factura": st.session_state.tipo_factura,
+                        "tipo_factura": venta_compra,
                         "json_front_modified": factura_data_json,
                     },
                     files={"file": factura_img},
                 )
+
                 if response.status_code == 200:
                     st.session_state["layoutConfig"] = "centered"
                     st.session_state["edit_factura"] = ""
                     st.session_state["imagen_factura"] = ""
-                    st.session_state["tipo_factura"] = ""
                     st.rerun()
 
     with col3:
         items_container = st.container(border=True)
-        if items is []:
+        if items is not []:
             with items_container:
                     st.title("Items Factura")
 
@@ -109,4 +109,4 @@ def edit_factura_dialog(factura_data, factura_img, tipo_factura):
                 st.title("No items found")
 
 
-edit_factura_dialog(st.session_state.get("edit_factura", {}), st.session_state.get("imagen_factura", ""),st.session_state["tipo_factura"])
+edit_factura(st.session_state.get("edit_factura", {}), st.session_state.get("imagen_factura", ""), st.session_state["venta_compra"])
