@@ -63,17 +63,20 @@ class misfacturasclass:
                     st.markdown(factura_card_style(), unsafe_allow_html=True)
                     response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}")
                     data = response.json()
-
-                    if "data" in data:
-                        for factura in data["data"]:
-                            st.markdown(
-                                factura_card(
-                                    factura["id_factura"],
-                                    factura["datos_factura"]["receptor"]["nombre"],
-                                    factura["datos_factura"]["fecha_operacion"],
-                                    factura["datos_factura"]["totales"].get("total_factura", "No disponible")
-                                ),
-                                unsafe_allow_html=True
-                            )
+                    if data != None:
+                        if "data" in data:
+                            for factura in data["data"]:
+                                st.markdown(
+                                    factura_card(
+                                        factura["id_factura"],
+                                        factura["datos_factura"]["receptor"]["nombre"],
+                                        factura["datos_factura"]["fecha_operacion"],
+                                        factura["datos_factura"]["totales"].get("total_factura", "No disponible")
+                                    ),
+                                    unsafe_allow_html=True
+                                )
+                        else:
+                            st.error("No se encontraron facturas o hubo un error al cargar los datos.")
                     else:
-                        st.error("No se encontraron facturas o hubo un error al cargar los datos.")
+                        st.write("No hay facturas disponibles")
+
