@@ -10,6 +10,16 @@ class Usuario(BaseModel):
     id: Optional[int] = Field(None, description="ID del usuario")
 
 
+class UsuarioFinanciero(BaseModel):
+    usr_finan_id: int = Field(..., description="Id del usuario asociado al login FK")
+    ingresos_fact: float = Field(0.0 , description="Ingresos de dinero por facturas")
+    gastos_fact: float = Field(0.0 , description="Gastos de dinero por facturas")
+    balance_fact: float = Field(0.0 , description="Balance economico de facturas")
+
+    def calcular_balance(self):
+        self.balance_fact = self.ingresos_fact - self.gastos_fact
+
+
 """Clases para elementos de factura"""
 
 

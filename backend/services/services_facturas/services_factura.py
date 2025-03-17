@@ -1,4 +1,7 @@
 import io
+from urllib.error import HTTPError
+
+from fastapi.encoders import jsonable_encoder
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -20,6 +23,7 @@ import pytesseract
 import platform
 
 
+
 pytesseract.pytesseract.tesseract_cmd = (
     r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 )
@@ -39,16 +43,16 @@ def srv_interpretar_factura(texto_factura):
             (
                 "system",
                 """
-            Eres un asistente experto en facturación, especializado en la extracción de datos de facturas. 
+            Eres un asistente experto en facturación, especializado en la extracción de datos de facturas.
             Ten en cuenta las siguientes recomendaciones :
-            - Identificación del tipo de factura: 
+            - Identificación del tipo de factura:
                 -Rectificativa: si se hace mención a esta palabra y acompaña un numero de otra factura , se considerará rectificativa
                 -Simplificada: si se hace mencion a esta palabra , se considera simplificada. En caso de no aparacer la palabra simplificada y no haber datos del receptor se considerará simplificada
                 -Completa: cuando existe un emisor y un receptor en la factura
             - Número de factura: puede contener números, letras y caracteres especiales
             - Serie factura : suele formar parte del numero de factura como un año de 2 o 4 digitos, aunque puede ser letras o numeros
             - NIF o CIF : en algunos casos puede aparecer como D.N.I o DNI . En todos los casos puede ser una cadena de numeros y numeros
-            - Menciones especiales: solo si alguna referencia a las siguientes esta presente 
+            - Menciones especiales: solo si alguna referencia a las siguientes esta presente
                 - Operación exenta de IVA (Ejemplo: "exento de IVA" o "artículo 20 LIVA").
                 - Facturación por destinatario (mención de "autofacturación").
                 - Inversión del sujeto pasivo (Ejemplo: "artículo 84.Uno.2º LIVA").
@@ -89,9 +93,16 @@ async def serv_guardar_datos_factura_json(datos_json, id, nombre_imagen, tipo_fa
     :param datos_json:
     :return:
     """
+    try:
 
-    await db.insertar_factura_db(datos_json, id, nombre_imagen, tipo_factura)
-    print("servicesGuardarFacturaDB")
+            response_factura = await db.insertar_factura_db(datos_json, id, nombre_imagen, tipo_factura)
+            serv_actualizar_balance(id, tipo_factura, datos_json["totales"]["total_factura"])
+
+
+            return response_factura
+
+    except Exception as e:
+           return {"success": False, "error": str(e)}
 
 
 def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
@@ -157,3 +168,36 @@ def factura_db_services(email):
         factura["url"] = url
 
     return response
+
+def serv_obtener_balance(id):
+    response = db.sp_obtener_balance(id)
+    print(response.data[0])
+    return response
+
+def serv_actualizar_balance(id,tipo_factura,total_monto):
+    try:
+        response = db.sp_obtener_balance(id)
+        if not response.data:
+            raise ValueError("Usuario financiero no encontrado")
+        datos_finan = response.data[0]
+
+        if tipo_factura == "Venta":
+            nuevos_ingresos = float(datos_finan["ingresos_fact"]) + float(total_monto)
+            nuevos_gastos = float(datos_finan["gastos_fact"])
+
+        elif tipo_factura == "Compra":
+            nuevos_ingresos = float(datos_finan["ingresos_fact"])
+            nuevos_gastos = float(datos_finan["gastos_fact"]) + float(total_monto)
+
+        else:
+            raise ValueError("No se puede indentificar el tipo de factura")
+
+        nuevo_balance = nuevos_ingresos - nuevos_gastos
+
+        ingresar_balance=db.sp_actualizar_balance(id, nuevos_ingresos, nuevos_gastos, nuevo_balance)
+
+        return ingresar_balance
+
+    except Exception as e:
+
+        return {"success": False, "error": str(e)}
