@@ -31,7 +31,6 @@ if st.button("Confirmar", disabled=flag_button):
     progreso = st.progress(10)
     mensaje = st.empty()
     mensaje.write("FacturIA subiendo y procesando la factura...")
-    st.session_state["layoutConfig"] = "wide"
 
     email = st.session_state.email
 
@@ -48,8 +47,10 @@ if st.button("Confirmar", disabled=flag_button):
         st.success("Factura procesada correctamente.")
         progreso.empty()
         mensaje.empty()
+        st.session_state["layoutConfig"] = "wide"
         st.session_state["edit_factura"] = response.json()
         st.session_state["imagen_factura"] = uploaded_file
+        st.session_state["venta_compra"] = tipo_factura_seleccionado
         st.rerun()
 
     else:
