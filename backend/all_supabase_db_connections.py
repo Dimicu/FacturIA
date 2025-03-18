@@ -294,3 +294,8 @@ class SupabaseDB_connection:
             .execute()
         )
         return response
+
+    def insert_monitoring(self, table: str, data: dict):
+
+        response = self.supabase.table(table).insert(data).execute()
+        return response
