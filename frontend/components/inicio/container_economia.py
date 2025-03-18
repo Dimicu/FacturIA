@@ -1,9 +1,7 @@
-import json
-
-import streamlit as st
-import requests
-from streamlit_extras.metric_cards import style_metric_cards
 import plotly.graph_objects as go
+import requests
+import streamlit as st
+
 
 class economiaclass:
     def render_economia(self):
