@@ -1,20 +1,30 @@
 import streamlit as st
 from components.main.logout import logout
 
-# Configuración de la página
-st.set_page_config(page_title="FacturIA")
-
-# Verificar si el usuario ha iniciado sesión
+if "layoutConfig" not in st.session_state:
+    st.session_state["layoutConfig"] = "centered"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "edit_factura" not in st.session_state:
+    st.session_state["edit_factura"] = ""
+if "imagen_factura" not in st.session_state:
+    st.session_state["imagen_factura"] = ""
 
-# Si el usuario está autenticado, mostrar la MainPage
+
+st.set_page_config(page_title="FacturIA",layout=st.session_state["layoutConfig"])
+
 if st.session_state.authenticated:
+    st.sidebar.title(st.session_state['email'].split('@')[0].capitalize())
     pageManager = st.navigation([
         st.Page("views/main/main.py", title="Mis facturas", default=True),
         st.Page("views/main/anadir_facturas.py", title="Añadir facturas")
     ])
-    logout().logoutbutton()
+    if st.session_state["edit_factura"] != "":
+        pageManager = st.navigation([
+            st.Page("views/main/editar_facturas.py", title="Mis facturas", default=True)
+        ])
+    if st.session_state["edit_factura"] == "":
+        logout().logoutbutton()
 else:
     pageManager = st.navigation([
         st.Page("views/home/home.py", title="Inicio", default=True),

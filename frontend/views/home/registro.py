@@ -53,10 +53,11 @@ def register_page():
             if status_code == 201:
                 st.success({error_message})
                 st.session_state["logged_in"] = True
+                st.session_state.authenticated = True
                 st.session_state["email"] = email
                 st.write("Redirigiendo...")
                 time.sleep(3)
-                # st.rerun()
+                st.rerun()
 
             elif status_code == 400:
                 st.error(f"Error frontend: {error_message}")

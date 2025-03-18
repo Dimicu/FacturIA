@@ -2,12 +2,15 @@ import os
 import logging
 import bcrypt
 from dotenv import load_dotenv
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm.sync import update
 
 
 # from multipart import file_path
 from supabase import create_client, Client
 
 
+from backend.model.modelos import UsuarioFinanciero
 from backend.utils.throw_json_error import throw_json_error
 
 
@@ -46,10 +49,16 @@ class SupabaseDB_connection:
             .execute()
         )
 
-        if response.data == 201:
-            return "Factura guardada con éxito"
-        elif response.data == 400:
-            return throw_json_error("Error en los datos proporcionado", 400)
+        if response.data:  # Si hay datos, la inserción fue exitosa
+            return {
+                "success": True,
+                "message": "Factura guardada con éxito",
+                "data": response.data,
+            }
+        elif response.error:  # Si hay un error, devuelve el mensaje de error
+            return {"success": False, "error": response.error.message}
+
+        return {"success": False, "error": "Error desconocido al insertar la factura"}
 
     def actualizar_factura(self, email: str, updates: dict):
 
@@ -149,7 +158,31 @@ class SupabaseDB_connection:
                     )
                     .execute()
                 )
+                print(respuesta_insertar.data[0]["id"])
                 if respuesta_insertar.data:
+                    usuario_id = respuesta_insertar.data[0][
+                        "id"
+                    ]  # Obtener ID del usuario creado
+                    usu_finan = UsuarioFinanciero(
+                        usr_finan_id=usuario_id,
+                        ingresos_fact=0.0,
+                        gastos_fact=0.0,
+                        balance_fact=0.0,
+                    )
+
+                    # Crear usuario financiero asociado
+                    respuesta_financiero = (
+                        self.supabase.table("usuario_financiero")
+                        .insert(
+                            {
+                                "usr_finan_id": usu_finan.usr_finan_id,
+                                "balance_fact": usu_finan.balance_fact,
+                                "ingresos_fact": usu_finan.ingresos_fact,
+                                "gastos_fact": usu_finan.gastos_fact,
+                            }
+                        )
+                        .execute()
+                    )
 
                     return throw_json_error(
                         f"Usuario registrado correctamente con el correo {email}", 201
@@ -238,8 +271,26 @@ class SupabaseDB_connection:
 
         return response.data[0]["id"]
 
-    # metodos monitoreo
-    def insert_monitoring(self, table: str, data: dict):
+    def sp_obtener_balance(self, id):
+        response = (
+            self.supabase.table("usuario_financiero")
+            .select("*")
+            .eq("usr_finan_id", id)
+            .execute()
+        )
+        return response
 
-        response = self.supabase.table(table).insert(data).execute()
+    def sp_actualizar_balance(self, id, ingresos_fact, gastos_fact, balance_fact):
+        response = (
+            self.supabase.table("usuario_financiero")
+            .update(
+                {
+                    "balance_fact": balance_fact,
+                    "ingresos_fact": ingresos_fact,
+                    "gastos_fact": gastos_fact,
+                }
+            )
+            .eq("usr_finan_id", id)
+            .execute()
+        )
         return response

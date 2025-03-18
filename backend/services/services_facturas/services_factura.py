@@ -1,4 +1,7 @@
 import io
+from urllib.error import HTTPError
+
+from fastapi.encoders import jsonable_encoder
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -18,6 +21,7 @@ import os
 from PIL import Image
 import pytesseract
 import platform
+
 
 
 pytesseract.pytesseract.tesseract_cmd = (
@@ -89,8 +93,16 @@ async def serv_guardar_datos_factura_json(datos_json, id, nombre_imagen, tipo_fa
     :param datos_json:
     :return:
     """
+    try:
 
-    await db.insertar_factura_db(datos_json, id, nombre_imagen, tipo_factura)
+            response_factura = await db.insertar_factura_db(datos_json, id, nombre_imagen, tipo_factura)
+            serv_actualizar_balance(id, tipo_factura, datos_json["totales"]["total_con_iva"])
+
+
+            return response_factura
+
+    except Exception as e:
+           return {"success": False, "error": str(e)}
 
 
 def serv_coste_guardar_fact_tabla(modelo, tokens, tokens_cost):
@@ -156,3 +168,41 @@ def factura_db_services(email):
         factura["url"] = url
 
     return response
+
+def serv_obtener_balance(email):
+    try:
+        id = db.obtener_users_id_por_email(email)
+        response = db.sp_obtener_balance(id)
+        return response
+    except ValueError as ve:
+        raise ve  # Relanzamos errores esperados
+    except Exception as e:
+        raise RuntimeError("Error al obtener balance")  # Relanzamos con un mensaje genérico
+
+def serv_actualizar_balance(id,tipo_factura,total_monto):
+    try:
+        response = db.sp_obtener_balance(id)
+        if not response.data:
+            raise ValueError("Usuario financiero no encontrado")
+        datos_finan = response.data[0]
+
+        if tipo_factura == "Venta":
+            nuevos_ingresos = float(datos_finan["ingresos_fact"]) + float(total_monto)
+            nuevos_gastos = float(datos_finan["gastos_fact"])
+
+        elif tipo_factura == "Compra":
+            nuevos_ingresos = float(datos_finan["ingresos_fact"])
+            nuevos_gastos = float(datos_finan["gastos_fact"]) + float(total_monto)
+
+        else:
+            raise ValueError("No se puede indentificar el tipo de factura")
+
+        nuevo_balance = nuevos_ingresos - nuevos_gastos
+
+        ingresar_balance=db.sp_actualizar_balance(id, nuevos_ingresos, nuevos_gastos, nuevo_balance)
+
+        return ingresar_balance
+
+    except Exception as e:
+
+        return {"success": False, "error": str(e)}
