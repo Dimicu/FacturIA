@@ -28,24 +28,23 @@ class economiaclass:
 
                 # Segunda fila con gráfico Donut
                 st.divider()  # Línea separadora opcional
-                colores = ['#28A745', '#DC3545', '#007BFF']  # Azul, Rojo, Verde
+                colores = ['#DC3545 ', '#28A745', '#007BFF']  # Azul, Rojo, Verde
 
                 fig = go.Figure(data=[go.Pie(
-                labels=['Ingresos', 'Gastos', 'Balance'],
-                values=[ingresos, gastos,balance ],
+                labels=['Gastos', 'Ingresos', 'Balance'],
+                values=[gastos, ingresos,balance ],
                 hole=0.6,  # Tamaño del agujero del donut
                 marker=dict(colors=colores, line=dict(color='#FFFFFF', width=2)),  # Colores y bordes
                 hoverinfo="label+value",  # Muestra etiqueta y valor en hover
-                textinfo="none",
-                textfont=dict(size=14, color="black"),  # Tamaño de texto dentro del gráfico
-                outsidetextfont=dict(size=14, color="black")  # Texto fuera del gráfico
+                textinfo="none"
+
             )])
 
                 # Ajustar diseño del gráfico
                 fig.update_layout(
                     height=330, width=330,  # Tamaño del gráfico
                     margin=dict(l=10, r=10, t=10, b=10),  # Márgenes
-                    showlegend=True,  # Ocultar leyenda
+                    showlegend=False,  # Ocultar leyenda
                     hoverlabel=dict(font_size=14, font_family="Arial")  # Tamaño de letra en hover
                 )
 
