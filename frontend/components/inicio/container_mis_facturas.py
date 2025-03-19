@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import streamlit as st
 import requests
 from streamlit import session_state
@@ -48,6 +50,24 @@ def factura_card(id, cliente, fecha, total):
     """
     return card_html
 
+def factura_mini_card(id_factura, numero_factura, emisor, receptor, fecha, total, tipo_factura):
+    """Crea una tarjeta de factura mostrando los datos esenciales, incluyendo si es venta o compra"""
+    with st.container():
+        col1, col2 = st.columns(2)
+        nombre = emisor if tipo_factura == "Compra" else receptor
+
+        with col1:
+            st.write(f"**Num. Factura:** {numero_factura}")
+            st.write(f"**Cliente/Proveedor:** {nombre}")
+            st.write(f"**Fecha:** {datetime.strptime(fecha, '%Y-%m-%d').strftime('%d/%m/%Y')}")
+
+        with col2:
+            st.write(f"**Tipo:** {tipo_factura.capitalize()}")  # Muestra "Venta" o "Compra"
+            st.write(f"**Total:** {total}")
+
+
+
+
 
 class misfacturasclass:
     def misfacturas(self):
@@ -59,22 +79,41 @@ class misfacturasclass:
             with info_row[0]:
                 st.title("Mis facturas")
             with bill_row[0]:
+
+                filtro = st.radio("Filtrar por:", ["Todas", "Venta", "Compra"], horizontal=True)
+
                 with st.spinner('Cargando tus facturas...'):
                     st.markdown(factura_card_style(), unsafe_allow_html=True)
-                    response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}/{session_state['email']}")
-                    data = response.json()
-                    if data["data"] != []:
-                        if "data" in data:
-                            for factura in data["data"]:
-                                st.markdown(
-                                    factura_card(
+                    response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}")
+                    datos = response.json()
+
+
+                    if datos["data"] != []:
+                        if "data" in datos:
+                            facturas_filtradas = [
+                                factura for factura in datos["data"]
+                                if filtro == "Todas" or factura["tipo_de_factura"].lower() == filtro.lower()
+                            ]
+
+                            for factura in facturas_filtradas:
+                                with st.container(border=True):
+                                    factura_mini_card(
                                         factura["id_factura"],
+                                        factura["datos_factura"]["numero_factura"],
+                                        factura["datos_factura"]["emisor"]["nombre"],
                                         factura["datos_factura"]["receptor"]["nombre"],
-                                        factura["datos_factura"]["fecha_operacion"],
-                                        factura["datos_factura"]["totales"].get("total_factura", "No disponible")
-                                    ),
-                                    unsafe_allow_html=True
-                                )
+                                        factura["datos_factura"]["fecha_expedicion"],
+                                        factura["datos_factura"]["totales"]["total_con_iva"],
+                                        factura["tipo_de_factura"]
+                                    )
+                                    # Botón para editar factura
+                                    if st.button("Editar", key=f"editar_{factura['id_factura']}"):
+                                        st.session_state["actualizar_factura"] = factura  # Guardar factura
+                                        st.session_state["pagina_actual"] = "editar"  # Cambiar vista
+                                        st.rerun()  # Recargar
+
+
+
                         else:
                             st.error("No se encontraron facturas o hubo un error al cargar los datos.")
                     else:
