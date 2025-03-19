@@ -37,7 +37,7 @@ if st.button("Confirmar", disabled=flag_button):
     files = {"file": uploaded_file}
     data = {"email": email, "tipo_factura": tipo_factura_seleccionado}
     response = requests.post(
-        "http://127.0.0.1:8000/facturas/file", files=files, data=data
+        "https://facturia-backend-48606537894.us-central1.run.app/facturas/file", files=files, data=data
     )
 
     for i in range(1, 101):

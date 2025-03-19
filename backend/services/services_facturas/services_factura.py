@@ -22,11 +22,15 @@ from PIL import Image
 import pytesseract
 import platform
 
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Ruta en Linux (Docker)
 
-
-pytesseract.pytesseract.tesseract_cmd = (
-    r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-)
+try:
+    print("Tesseract version:", pytesseract.get_tesseract_version())
+except Exception as e:
+    print("Error al detectar Tesseract:", e)
 
 
 load_dotenv()

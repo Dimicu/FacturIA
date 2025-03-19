@@ -6,7 +6,7 @@ import streamlit as st
 class economiaclass:
     def render_economia(self):
         economia_container = st.container(border=True)
-        response = requests.get(f"http://127.0.0.1:8000/facturas/balance/{st.session_state['email']}")
+        response = requests.get(f"https://facturia-backend-48606537894.us-central1.run.app/facturas/balance/{st.session_state['email']}")
         data = response.json()
         if not data:
             st.warning("⚠️ No se encontraron datos de balance.")

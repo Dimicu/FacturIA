@@ -50,7 +50,7 @@ def registro(usuario: Usuario):
     try:
 
         # response_registro = registro(str(usuario)) PRUEBA CAPTURAR ERROR MONITORING
-        response_registro = services_user.registro(dict(usuario))
+        response_registro = services_user.registro_services(dict(usuario))
         return response_registro
     except Exception as e:
 
@@ -117,8 +117,6 @@ async def guardar_bd_factura(
     tipo_factura: str = Form(...),
     json_front_modified: str = Form(...),
 ):
-    print("asdasdsadsad")
-    print(tipo_factura)
     json_formateado = json.loads(json_front_modified)
     user_id = db.obtener_users_id_por_email(email)
     content_changed = await file.read()

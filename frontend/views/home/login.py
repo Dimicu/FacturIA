@@ -27,7 +27,7 @@ def login_page():
             status_code = 0
             try:
                 response = requests.post(
-                    "http://127.0.0.1:8000/login", json=user_data
+                    "https://facturia-backend-48606537894.us-central1.run.app/login", json=user_data
                 ).json()
 
                 error_message = response.get("error", "")

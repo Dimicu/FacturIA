@@ -67,7 +67,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
                 factura_data_json = json.dumps(factura_data)
 
                 response = requests.post(
-                    "http://127.0.0.1:8000/facturas/completa",
+                    "https://facturia-backend-48606537894.us-central1.run.app/facturas/completa",
                     data={
                         "email": st.session_state["email"],
                         "tipo_factura": venta_compra,
