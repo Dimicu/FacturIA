@@ -14,7 +14,6 @@ if "imagen_factura" not in st.session_state:
 st.set_page_config(page_title="FacturIA",layout=st.session_state["layoutConfig"])
 
 if st.session_state.authenticated:
-    st.sidebar.title(st.session_state['email'].split('@')[0].capitalize())
     pageManager = st.navigation([
         st.Page("views/main/main.py", title="Mis facturas", default=True),
         st.Page("views/main/anadir_facturas.py", title="Añadir facturas")
@@ -24,6 +23,7 @@ if st.session_state.authenticated:
             st.Page("views/main/editar_facturas.py", title="Mis facturas", default=True)
         ])
     if st.session_state["edit_factura"] == "":
+        st.sidebar.title(st.session_state['email'].split('@')[0].capitalize())
         logout().logoutbutton()
 else:
     pageManager = st.navigation([
