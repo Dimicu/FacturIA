@@ -61,7 +61,7 @@ class misfacturasclass:
             with bill_row[0]:
                 with st.spinner('Cargando tus facturas...'):
                     st.markdown(factura_card_style(), unsafe_allow_html=True)
-                    response = requests.get(f"https://facturia-backend-48606537894.us-central1.run.app/facturas/{session_state['email']}")
+                    response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}/{session_state['email']}")
                     data = response.json()
                     if data["data"] != []:
                         if "data" in data:
