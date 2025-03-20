@@ -13,9 +13,9 @@ class economiaclass:
         else:
             with economia_container:
 
-                ingresos = data[0]["ingresos_fact"]
-                gastos = data[0]["gastos_fact"]
-                balance = data[0]["balance_fact"]
+                ingresos = round(data[0]["ingresos_fact"], 2)
+                gastos = round(data[0]["gastos_fact"],2)
+                balance = round(data[0]["balance_fact"], 2)
                 # Primera fila con métricas
                 col1, col2, col3 = st.columns(3)
 
