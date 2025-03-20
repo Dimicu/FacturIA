@@ -20,7 +20,7 @@ def calcular_total_sin_iva(items):
         total += total_item
     return total
 
-def edit_factura(factura_data, factura_img, venta_compra):
+def edit_factura(factura_data):
 
     def validar_nif_cif(nif):
         return bool(re.match(r'^[A-Z0-9]{8,9}$', nif))
@@ -121,8 +121,8 @@ def edit_factura(factura_data, factura_img, venta_compra):
             if st.button("No", use_container_width=True):
                 st.rerun()
 
-    factura = factura_data
-    items = factura_data["items"]
+    factura = factura_data["datos_factura"]
+    items = factura["items"]
     imprimir_errores_flag = False
     imprimir_errores_items_flag = False
     errores = ""
@@ -134,7 +134,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
         image_container = st.container(border=True)
         with image_container:
             st.title("Factura")
-            st.image(factura_img, use_container_width=True)
+            st.image(factura_data["url"], use_container_width=True)
             total_con_IVA = calcular_total_con_iva(items)
             total_sin_IVA = calcular_total_sin_iva(items)
             st.subheader("Total de la Factura:")
@@ -172,36 +172,35 @@ def edit_factura(factura_data, factura_img, venta_compra):
                 if errores:
                     imprimir_errores_flag = True
                 else:
-                    factura_data["tipo_factura"] = tipo_factura
-                    factura_data["numero_factura"] = numero_factura
-                    factura_data["serie"] = serie_factura
-                    factura_data["fecha_expedicion"] = fecha_expedicion
-                    factura_data["fecha_operacion"] = fecha_operacion
-                    factura_data["emisor"]["nombre"] = emisor_nombre
-                    factura_data["emisor"]["NIF_CIF"] = emisor_nif
-                    factura_data["emisor"]["domicilio"] = emisor_domicilio
-                    factura_data["receptor"]["nombre"] = receptor_nombre
-                    factura_data["receptor"]["NIF_CIF"] = receptor_nif
-                    factura_data["receptor"]["domicilio"] = receptor_domicilio
-                    factura_data["totales"]["total_con_iva"] = total_con_IVA
-                    factura_data["totales"]["total_sin_iva"] = total_sin_IVA
+                    factura_data["datos_factura"]["tipo_factura"] = tipo_factura
+                    factura_data["datos_factura"]["numero_factura"] = numero_factura
+                    factura_data["datos_factura"]["serie"] = serie_factura
+                    factura_data["datos_factura"]["fecha_expedicion"] = fecha_expedicion
+                    factura_data["datos_factura"]["fecha_operacion"] = fecha_operacion
+                    factura_data["datos_factura"]["emisor"]["nombre"] = emisor_nombre
+                    factura_data["datos_factura"]["emisor"]["NIF_CIF"] = emisor_nif
+                    factura_data["datos_factura"]["emisor"]["domicilio"] = emisor_domicilio
+                    factura_data["datos_factura"]["receptor"]["nombre"] = receptor_nombre
+                    factura_data["datos_factura"]["receptor"]["NIF_CIF"] = receptor_nif
+                    factura_data["datos_factura"]["receptor"]["domicilio"] = receptor_domicilio
+                    factura_data["datos_factura"]["totales"]["total_con_iva"] = total_con_IVA
+                    factura_data["datos_factura"]["totales"]["total_sin_iva"] = total_sin_IVA
 
                     factura_data_json = json.dumps(factura_data)
-
-                    response = requests.post(
-                        "https://facturia-backend-48606537894.us-central1.run.app/facturas/completa",
+                    # st.write(factura_data)
+                    st.write(factura_data)
+                    # print(factura_data)
+                    response = requests.put(
+                        f"http://127.0.0.1:8000/facturas/actualizacion/{factura_data["id_factura"]}",
                         data={
-                            "email": st.session_state["email"],
-                            "tipo_factura": venta_compra,
-                            "json_front_modified": factura_data_json,
-                        },
-                        files={"file": factura_img},
+                            "id_factura": factura_data["id_factura"],
+                            "factura": factura_data_json
+                        }
                     )
-
+                    # st.write(response.json())
                     if response.status_code == 200:
                         st.session_state["layoutConfig"] = "centered"
                         st.session_state["edit_factura"] = ""
-                        st.session_state["imagen_factura"] = ""
                         st.rerun()
 
     with col3_form:
@@ -265,4 +264,4 @@ def edit_factura(factura_data, factura_img, venta_compra):
     imprimir_errores(errores_items, imprimir_errores_items_flag)
 
 
-edit_factura(st.session_state.get("edit_factura", {}), st.session_state.get("imagen_factura", ""), st.session_state["venta_compra"])
+edit_factura(st.session_state.get("edit_factura", {}))

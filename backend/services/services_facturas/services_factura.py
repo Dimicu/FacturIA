@@ -214,13 +214,8 @@ def serv_actualizar_balance(id,tipo_factura,total_monto):
         return {"success": False, "error": str(e)}
 
 
-def serv_actualizar_factura(id_factura, factura :dict):
-    print(f"ID Factura recibido en actualización: {id_factura}")
-    print("SERVICES----------------------------", id_factura)
-    print("Tipo de id_factura:", type(id_factura))
-    print("Tipo de factura:", type(factura))
-    if not id_factura:
-        raise ValueError("El id_factura no puede ser None o vacío")
+def serv_actualizar_factura(id_factura, factura:dict ):
 
     response = db.actualizar_factura(id_factura, factura)
+
     return response

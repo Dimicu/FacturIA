@@ -4,51 +4,7 @@ import streamlit as st
 import requests
 from streamlit import session_state
 
-
-def factura_card_style():
-    style = """
-    <style>
-        .factura-card {
-            border: 2px solid #c4c4c7;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-        .factura-card:hover {
-            background-color: #f1f1f1;
-        }
-        .factura-card p {
-            font-size: 16px;
-            margin: 5px 0;
-            color: black; /* Asegura que el texto no sea azul */
-        }
-        /* Asegura que el enlace no esté subrayado */
-        .factura-link {
-            text-decoration: none !important;  /* Añadir !important para sobrescribir cualquier otro estilo */
-            color: inherit !important;         /* Asegura que el color no sea azul */
-            display: block;                    /* Hace que el enlace abarque toda la tarjeta */
-        }
-    </style>
-    """
-    return style
-
-
-def factura_card(id, cliente, fecha, total):
-    factura_url = f"/factura_detalle?id={id}"  # URL de destino
-    card_html = f"""
-    <a href="{factura_url}" class="factura-link">
-        <div class="factura-card">
-            <p><strong>ID de Factura:</strong> {id}</p>
-            <p><strong>Cliente:</strong> {cliente}</p>
-            <p><strong>Fecha:</strong> {fecha}</p>
-            <p><strong>Total:</strong> {total} EUR</p>
-        </div>
-    </a>
-    """
-    return card_html
+st.session_state["actualizar_factura"] = ""
 
 def factura_mini_card(id_factura, numero_factura, emisor, receptor, fecha, total, tipo_factura):
     """Crea una tarjeta de factura mostrando los datos esenciales, incluyendo si es venta o compra"""
@@ -83,10 +39,9 @@ class misfacturasclass:
                 filtro = st.radio("Filtrar por:", ["Todas", "Venta", "Compra"], horizontal=True)
 
                 with st.spinner('Cargando tus facturas...'):
-                    st.markdown(factura_card_style(), unsafe_allow_html=True)
                     response = requests.get(f"http://127.0.0.1:8000/facturas/{session_state['email']}")
                     datos = response.json()
-
+                    st.write(st.session_state["edit_factura"])
 
                     if datos["data"] != []:
                         if "data" in datos:
@@ -106,11 +61,10 @@ class misfacturasclass:
                                         factura["datos_factura"]["totales"]["total_con_iva"],
                                         factura["tipo_de_factura"]
                                     )
-                                    # Botón para editar factura
                                     if st.button("Editar", key=f"editar_{factura['id_factura']}"):
-                                        st.session_state["actualizar_factura"] = factura  # Guardar factura
-                                        st.session_state["pagina_actual"] = "editar"  # Cambiar vista
-                                        st.rerun()  # Recargar
+                                        st.session_state["layoutConfig"] = "wide"
+                                        st.session_state["edit_factura"] = factura
+                                        st.rerun()
 
 
 

@@ -156,16 +156,12 @@ def obtener_factura_balance(email):
         raise HTTPException(status_code=500, detail="Ocurrió un error inesperado. Inténtalo más tarde.")
 
 @router.put("/facturas/actualizacion/{id_factura}")
-def actualizar_factura (id_factura :int , factura :dict):
-    print("CONTROLLER----------------------------", id_factura)
+def actualizar_factura (id_factura :int , factura: str = Form(...),):
 
-    try:
-        response = services_factura.serv_actualizar_factura(id_factura, factura)
-        return response
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+    factura_loaded = json.loads(factura)
+    response = services_factura.serv_actualizar_factura(id_factura, factura_loaded)
+
+    return response
 
 """
 @router.put("/facturas/actualizacion/{id}")

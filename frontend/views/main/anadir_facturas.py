@@ -48,7 +48,7 @@ if st.button("Confirmar", disabled=flag_button):
         progreso.empty()
         mensaje.empty()
         st.session_state["layoutConfig"] = "wide"
-        st.session_state["edit_factura"] = response.json()
+        st.session_state["anadir_factura"] = response.json()
         st.session_state["imagen_factura"] = uploaded_file
         st.session_state["venta_compra"] = tipo_factura_seleccionado
         st.rerun()
