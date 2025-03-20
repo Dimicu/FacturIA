@@ -22,6 +22,8 @@ from PIL import Image
 import pytesseract
 import platform
 
+
+
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 else:
@@ -210,3 +212,15 @@ def serv_actualizar_balance(id,tipo_factura,total_monto):
     except Exception as e:
 
         return {"success": False, "error": str(e)}
+
+
+def serv_actualizar_factura(id_factura, factura :dict):
+    print(f"ID Factura recibido en actualización: {id_factura}")
+    print("SERVICES----------------------------", id_factura)
+    print("Tipo de id_factura:", type(id_factura))
+    print("Tipo de factura:", type(factura))
+    if not id_factura:
+        raise ValueError("El id_factura no puede ser None o vacío")
+
+    response = db.actualizar_factura(id_factura, factura)
+    return response

@@ -60,11 +60,20 @@ class SupabaseDB_connection:
 
         return {"success": False, "error": "Error desconocido al insertar la factura"}
 
-    def actualizar_factura(self, email: str, updates: dict):
+    def actualizar_factura(self, id_factura,  updates: dict):
+        print(f"ID Factura recibido en actualización: {id_factura}")
+        if not id_factura:
+            raise ValueError("El id_factura no puede ser None o vacío")
 
-        response = (
-            self.supabase.table("facturas").update(updates).eq("email", email).execute()
-        )
+        print(updates)
+        # Filtrar la clave 'url' si está presente en updates
+        updates_sanitizado = {key: value for key, value in updates.items() if key != "url"}
+        print("Datos actualizados:", updates_sanitizado)
+
+        response = self.supabase.table("facturas").update(updates_sanitizado).eq("id_factura", id_factura).execute()
+
+        if response.get("error"):
+            raise ValueError(f"Error de Supabase: {response['error']}")
         return response
 
     def factura_db_supabase(self, email: str):

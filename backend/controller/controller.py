@@ -12,13 +12,10 @@ from starlette.responses import JSONResponse
 from monitoring.errores import errores_backend
 from backend.all_supabase_db_connections import SupabaseDB_connection
 from backend.model.modelos import Usuario
-from backend.services.services_facturas import services_factura
 from backend.services.services_usuario import services_user
 from backend.services.services_facturas import services_factura
 
 from fastapi import APIRouter, UploadFile, File, Form, Body
-
-
 import backend.services.services_facturas.services_factura
 
 
@@ -157,6 +154,18 @@ def obtener_factura_balance(email):
     except Exception as e:
         # Lanzar un error 500 sin exponer detalles internos
         raise HTTPException(status_code=500, detail="Ocurrió un error inesperado. Inténtalo más tarde.")
+
+@router.put("/facturas/actualizacion/{id_factura}")
+def actualizar_factura (id_factura :int , factura :dict):
+    print("CONTROLLER----------------------------", id_factura)
+
+    try:
+        response = services_factura.serv_actualizar_factura(id_factura, factura)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 """
 @router.put("/facturas/actualizacion/{id}")
