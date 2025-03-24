@@ -190,6 +190,12 @@ def edit_factura(factura_data):
             emisor_domicilio = st.text_input(
                 "Domicilio*", factura["emisor"]["domicilio"]
             )
+            emisor_nif = st.text_input(
+                "NIF/CIF*", factura["emisor"]["NIF_CIF"], max_chars=9
+            )
+            emisor_domicilio = st.text_input(
+                "Domicilio*", factura["emisor"]["domicilio"]
+            )
 
             st.subheader("Receptor")
             receptor_nombre = st.text_input(
@@ -197,6 +203,15 @@ def edit_factura(factura_data):
             )
             receptor_nif = st.text_input(
                 "NIF/CIF Cliente", factura["receptor"]["NIF_CIF"], max_chars=8
+            )
+            receptor_domicilio = st.text_input(
+                "Domicilio Cliente", factura["receptor"]["domicilio"]
+            )
+            receptor_nombre = st.text_input(
+                "Nombre Cliente", factura["receptor"]["nombre"]
+            )
+            receptor_nif = st.text_input(
+                "NIF/CIF Cliente", factura["receptor"]["NIF_CIF"], max_chars=9
             )
             receptor_domicilio = st.text_input(
                 "Domicilio Cliente", factura["receptor"]["domicilio"]

@@ -28,9 +28,9 @@ if st.session_state.authenticated:
         pageManager = st.navigation([
             st.Page("views/main/editar_facturas_form.py", title="Mis facturas", default=True)
         ])
-    # if st.session_state["edit_factura"] == "" or st.session_state["anadir_factura"] == "":
-    #     st.sidebar.title(st.session_state['email'].split('@')[0].capitalize())
-    #     logout().logoutbutton()
+    if st.session_state["edit_factura"] == "" and st.session_state["anadir_factura"] == "":
+        st.sidebar.title(st.session_state['email'].split('@')[0].capitalize())
+        logout().logoutbutton()
 else:
     pageManager = st.navigation([
         st.Page("views/home/home.py", title="Inicio", default=True),
