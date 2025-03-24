@@ -60,6 +60,10 @@ async def actualizar_datos_usuario(usuario: Usuario):
     services_user.actualizar_password(usuario)
     return "usuario actualizado"
 
+@router.get(("/usuarios/{email}"))
+def obtener_usuario_id_por_email(email :str):
+    response = services_user.serv_obtener_usuarios_email(email)
+    return response
 
 @router.delete("/usuarios/{id}")
 async def eliminar_usuario_id(id: int):
@@ -156,7 +160,8 @@ def obtener_factura_balance(email):
         raise HTTPException(status_code=500, detail="Ocurrió un error inesperado. Inténtalo más tarde.")
 
 @router.put("/facturas/actualizacion/{id_factura}")
-def actualizar_factura (id_factura :int , factura: str = Form(...),):
+def actualizar_factura (id_factura :int ,factura: str = Form(...)):
+
 
     factura_loaded = json.loads(factura)
     response = services_factura.serv_actualizar_factura(id_factura, factura_loaded)
