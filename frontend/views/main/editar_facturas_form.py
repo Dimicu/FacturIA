@@ -63,7 +63,7 @@ def edit_factura(factura_data):
         if not nuevo_nombre.strip():
             errores.append("El nombre del producto no puede estar vacío.")
 
-        if not cantidad.strip():
+        if not cantidad:
             errores.append("La cantidad no puede estar vacía.")
         else:
             try:
@@ -150,7 +150,7 @@ def edit_factura(factura_data):
                 ["Venta", "Compra"],
                 key="tipo_factura",
                 horizontal=True,
-                index=None
+                index=0 if factura_data["tipo_de_factura"] == "Venta" else 1
             )
 
             with col1:
@@ -178,7 +178,7 @@ def edit_factura(factura_data):
             numero_factura = st.text_input("Número de Factura*", factura["numero_factura"])
             serie_factura = st.text_input("Serie*", factura["serie"])
             fecha_expedicion = st.text_input("Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"])
-            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)*",
+            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)",
                                             factura["fecha_operacion"] if factura["fecha_operacion"] else "")
 
             if st.button("Confirmar datos de la factura"):
@@ -204,7 +204,7 @@ def edit_factura(factura_data):
                     factura_data_json = json.dumps(factura_data)
 
                     response = requests.put(
-                        f"http://127.0.0.1:8000/facturas/actualizacion/{factura_data["id_factura"]}",
+                        f" http://127.0.0.1:8000/facturas/actualizacion/{factura_data["id_factura"]}",
                         data={
                             "id_factura": factura_data["id_factura"],
                             "factura": factura_data_json
@@ -227,7 +227,7 @@ def edit_factura(factura_data):
                 selected_item = items[selected_index]
 
                 nuevo_nombre = st.text_input("Nuevo Nombre*", selected_item['descripcion'])
-                cantidad = st.text_input("Cantidad*", str(selected_item['cantidad']))
+                cantidad = st.number_input("Cantidad*", int(selected_item['cantidad']))
                 precio_unitario = st.text_input("Precio Unitario*", str(selected_item['precio_unitario']))
                 tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
                 cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
