@@ -60,7 +60,7 @@ async def actualizar_datos_usuario(usuario: Usuario):
     services_user.actualizar_password(usuario)
     return "usuario actualizado"
 
-@router.get(("/usuarios/{email}"))
+@router.get("/usuarios/{email}")
 def obtener_usuario_id_por_email(email :str):
     response = services_user.serv_obtener_usuarios_email(email)
     return response
