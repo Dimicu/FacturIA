@@ -63,7 +63,7 @@ class SupabaseDB_connection:
 
     def actualizar_factura(self, id_factura,  updates:dict):
 
-        updates_sanitizado = {key: value for key, value in updates.items() if key != "url"}
+        updates_sanitizado = {key: value for key, value in updates.items() if key not in ["url", "id_usuario"]}
 
         response = self.supabase.table("facturas").update(updates_sanitizado).eq("id_factura", id_factura).execute()
 

@@ -216,6 +216,11 @@ def serv_actualizar_balance(id,tipo_factura,total_monto):
 
 def serv_actualizar_factura(id_factura, factura:dict ):
 
+    tipo_factura = factura["tipo_de_factura"]
+    total_monto = factura["datos_factura"]["totales"]["total_con_iva"]
+    id_user = factura["id_usuario"]
     response = db.actualizar_factura(id_factura, factura)
+    if response :
+        serv_actualizar_balance(id_user, tipo_factura, total_monto)
 
     return response
