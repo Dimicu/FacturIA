@@ -52,6 +52,8 @@ def edit_factura(factura_data):
             errores.append("La fecha de expedición debe tener el formato YYYY-MM-DD.")
         if fecha_operacion and not validar_fecha(fecha_operacion):
             errores.append("La fecha de operación debe tener el formato YYYY-MM-DD.")
+        if not tipo_factura_seleccionado:
+            errores.append("Debe seleccionar operacion de Venta o Compra")
 
         return errores
 
@@ -122,6 +124,10 @@ def edit_factura(factura_data):
                 st.rerun()
 
     factura = factura_data["datos_factura"]
+    #Tengo el email y necesito el id para actualizar la factura
+    email = st.session_state["email"]
+    id = requests.get(f"http://127.0.0.1:8000/usuarios/{email}").json()
+
     items = factura["items"]
     imprimir_errores_flag = False
     imprimir_errores_items_flag = False
@@ -139,6 +145,14 @@ def edit_factura(factura_data):
             total_sin_IVA = calcular_total_sin_iva(items)
             st.subheader("Total de la Factura:")
             col1, col22 = st.columns([1, 1], gap="medium")
+            tipo_factura_seleccionado = st.radio(
+                "Elija el tipo de factura",
+                ["Venta", "Compra"],
+                key="tipo_factura",
+                horizontal=True,
+                index=None
+            )
+
             with col1:
                 st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
             with col22:
@@ -185,8 +199,10 @@ def edit_factura(factura_data):
                     factura_data["datos_factura"]["receptor"]["domicilio"] = receptor_domicilio
                     factura_data["datos_factura"]["totales"]["total_con_iva"] = total_con_IVA
                     factura_data["datos_factura"]["totales"]["total_sin_iva"] = total_sin_IVA
-
+                    factura_data["tipo_de_factura"] = tipo_factura_seleccionado
+                    factura_data["id_usuario"] = id
                     factura_data_json = json.dumps(factura_data)
+
                     response = requests.put(
                         f" https://facturia-backend-48606537894.us-central1.run.app/facturas/actualizacion/{factura_data["id_factura"]}",
                         data={
