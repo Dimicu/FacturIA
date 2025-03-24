@@ -187,17 +187,13 @@ def edit_factura(factura_data):
                     factura_data["datos_factura"]["totales"]["total_sin_iva"] = total_sin_IVA
 
                     factura_data_json = json.dumps(factura_data)
-                    # st.write(factura_data)
-                    st.write(factura_data)
-                    # print(factura_data)
                     response = requests.put(
-                        f"http://127.0.0.1:8000/facturas/actualizacion/{factura_data["id_factura"]}",
+                        f" https://facturia-backend-48606537894.us-central1.run.app/facturas/actualizacion/{factura_data["id_factura"]}",
                         data={
                             "id_factura": factura_data["id_factura"],
                             "factura": factura_data_json
                         }
                     )
-                    # st.write(response.json())
                     if response.status_code == 200:
                         st.session_state["layoutConfig"] = "centered"
                         st.session_state["edit_factura"] = ""
