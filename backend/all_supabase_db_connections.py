@@ -301,3 +301,7 @@ class SupabaseDB_connection:
 
         response = self.supabase.table(table).insert(data).execute()
         return response
+
+    def sp_obtener_factura_por_id(self, id):
+        response = self.supabase.table("facturas").select("datos_factura->totales->total_con_iva", "tipo_de_factura").eq("id_factura", id).execute()
+        return response

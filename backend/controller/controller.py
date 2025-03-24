@@ -146,6 +146,10 @@ async def guardar_bd_factura(
 def factura_db_controller(email):
     response = services_factura.factura_db_services(email)
     return response
+@router.get("/facturas/factura/{id}")
+def factura_db_controller(id:int):
+    response = services_factura.obtener_factura_por_id(id)
+    return response
 
 @router.get("/facturas/balance/{email}")
 def obtener_factura_balance(email):
@@ -168,11 +172,3 @@ def actualizar_factura (id_factura :int ,factura: str = Form(...)):
 
     return response
 
-"""
-@router.put("/facturas/actualizacion/{id}")
-def actualizar_balance(id,tipo_factura, total):
-    try:
-        response = services_factura.serv_actualizar_balance(id, tipo_factura, total)
-    except Exception as e:
-        print(f"error: {e}")
-    return jsonable_encoder(response)"""

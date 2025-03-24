@@ -224,3 +224,7 @@ def serv_actualizar_factura(id_factura, factura:dict ):
         serv_actualizar_balance(id_user, tipo_factura, total_monto)
 
     return response
+
+
+def obtener_factura_por_id(id):
+    return  db.sp_obtener_factura_por_id(id)
