@@ -50,7 +50,7 @@ def edit_factura(factura_data):
             errores.append("La serie de la factura no puede estar vacía.")
         if not validar_fecha(fecha_expedicion):
             errores.append("La fecha de expedición debe tener el formato YYYY-MM-DD.")
-        if fecha_operacion and not validar_fecha(fecha_operacion):
+        if not validar_fecha(fecha_operacion):
             errores.append("La fecha de operación debe tener el formato YYYY-MM-DD.")
         if not tipo_factura_seleccionado:
             errores.append("Debe seleccionar operacion de Venta o Compra")
@@ -126,7 +126,7 @@ def edit_factura(factura_data):
     factura = factura_data["datos_factura"]
     #Tengo el email y necesito el id para actualizar la factura
     email = st.session_state["email"]
-    id = requests.get(f"http://127.0.0.1:8000/usuarios/{email}").json()
+    id = requests.get(f"https://facturia-backend-48606537894.us-central1.run.app/usuarios/{email}").json()
 
     items = factura["items"]
     imprimir_errores_flag = False
@@ -178,7 +178,7 @@ def edit_factura(factura_data):
             numero_factura = st.text_input("Número de Factura*", factura["numero_factura"])
             serie_factura = st.text_input("Serie*", factura["serie"])
             fecha_expedicion = st.text_input("Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"])
-            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)",
+            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)*",
                                             factura["fecha_operacion"] if factura["fecha_operacion"] else "")
 
             if st.button("Confirmar datos de la factura"):
@@ -197,14 +197,14 @@ def edit_factura(factura_data):
                     factura_data["datos_factura"]["receptor"]["nombre"] = receptor_nombre
                     factura_data["datos_factura"]["receptor"]["NIF_CIF"] = receptor_nif
                     factura_data["datos_factura"]["receptor"]["domicilio"] = receptor_domicilio
-                    factura_data["datos_factura"]["totales"]["total_con_iva"] = total_con_IVA
-                    factura_data["datos_factura"]["totales"]["total_sin_iva"] = total_sin_IVA
+                    factura_data["datos_factura"]["totales"]["total_con_iva"] = round(total_con_IVA,2)
+                    factura_data["datos_factura"]["totales"]["total_sin_iva"] = round(total_sin_IVA, 2)
                     factura_data["tipo_de_factura"] = tipo_factura_seleccionado
                     factura_data["id_usuario"] = id
                     factura_data_json = json.dumps(factura_data)
 
                     response = requests.put(
-                        f" http://127.0.0.1:8000/facturas/actualizacion/{factura_data["id_factura"]}",
+                        f" https://facturia-backend-48606537894.us-central1.run.app/facturas/actualizacion/{factura_data["id_factura"]}",
                         data={
                             "id_factura": factura_data["id_factura"],
                             "factura": factura_data_json
@@ -241,9 +241,9 @@ def edit_factura(factura_data):
                         else:
                             items[selected_index]["descripcion"] = nuevo_nombre
                             items[selected_index]["cantidad"] = float(cantidad)
-                            items[selected_index]["precio_unitario"] = float(precio_unitario)
-                            items[selected_index]["tipo_IVA"] = float(tipo_iva)
-                            items[selected_index]["cuota_IVA"] = float(cuota_iva)
+                            items[selected_index]["precio_unitario"] = round(float(precio_unitario),2)
+                            items[selected_index]["tipo_IVA"] = round(float(tipo_iva),2)
+                            items[selected_index]["cuota_IVA"] = round(float(cuota_iva),2)
                             st.rerun()
                 with col2_add:
                     if st.button("Añadir", use_container_width=True):

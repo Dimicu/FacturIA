@@ -50,7 +50,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
             errores.append("La serie de la factura no puede estar vacía.")
         if not validar_fecha(fecha_expedicion):
             errores.append("La fecha de expedición debe tener el formato YYYY-MM-DD.")
-        if fecha_operacion and not validar_fecha(fecha_operacion):
+        if not validar_fecha(fecha_operacion):
             errores.append("La fecha de operación debe tener el formato YYYY-MM-DD.")
 
         return errores
@@ -216,7 +216,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
                 selected_item = items[selected_index]
 
                 nuevo_nombre = st.text_input("Nuevo Nombre*", selected_item['descripcion'])
-                cantidad = st.text_input("Cantidad*", str(selected_item['cantidad']))
+                cantidad = st.number_input("Cantidad*", int(selected_item['cantidad']))
                 precio_unitario = st.text_input("Precio Unitario*", str(selected_item['precio_unitario']))
                 tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
                 cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
@@ -230,9 +230,9 @@ def edit_factura(factura_data, factura_img, venta_compra):
                         else:
                             items[selected_index]["descripcion"] = nuevo_nombre
                             items[selected_index]["cantidad"] = float(cantidad)
-                            items[selected_index]["precio_unitario"] = float(precio_unitario)
-                            items[selected_index]["tipo_IVA"] = float(tipo_iva)
-                            items[selected_index]["cuota_IVA"] = float(cuota_iva)
+                            items[selected_index]["precio_unitario"] = round(float(precio_unitario), 2)
+                            items[selected_index]["tipo_IVA"] = round(float(tipo_iva), 2)
+                            items[selected_index]["cuota_IVA"] = round(float(cuota_iva), 2)
                             st.rerun()
                 with col2_add:
                     if st.button("Añadir", use_container_width=True):

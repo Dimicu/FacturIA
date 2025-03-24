@@ -47,6 +47,5 @@ class economiaclass:
                     showlegend=False,  # Ocultar leyenda
                     hoverlabel=dict(font_size=14, font_family="Arial")  # Tamaño de letra en hover
                 )
-
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, config={"displayModeBar": False}, use_container_width=True)
 
