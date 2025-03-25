@@ -15,7 +15,6 @@ from backend.model.modelos import Factura
 from backend.all_supabase_db_connections import SupabaseDB_connection
 from fastapi import FastAPI, UploadFile
 from dotenv import load_dotenv
-from backend.modelo_generativo import ModeloGPT
 import json
 import os
 from PIL import Image
@@ -37,7 +36,6 @@ except Exception as e:
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
-modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 db = SupabaseDB_connection()
 app = FastAPI()
 
@@ -185,37 +183,66 @@ def serv_obtener_balance(email):
     except Exception as e:
         raise RuntimeError("Error al obtener balance")  # Relanzamos con un mensaje genérico
 
-def serv_actualizar_balance(id,tipo_factura,total_monto):
+def serv_actualizar_balance(id,tipo_factura,total_monto, tipo_factura_antiguo=None, total_factura_antiguo =0 ):
     try:
         response = db.sp_obtener_balance(id)
         if not response.data:
-            raise ValueError("Usuario financiero no encontrado")
-        datos_finan = response.data[0]
-
-        if tipo_factura == "Venta":
-            nuevos_ingresos = float(datos_finan["ingresos_fact"]) + float(total_monto)
-            nuevos_gastos = float(datos_finan["gastos_fact"])
-
-        elif tipo_factura == "Compra":
-            nuevos_ingresos = float(datos_finan["ingresos_fact"])
-            nuevos_gastos = float(datos_finan["gastos_fact"]) + float(total_monto)
-
+            # Si no hay datos financieros previos, asumimos que ingresos y gastos son 0
+            ingresos = 0
+            gastos = 0
         else:
-            raise ValueError("No se puede indentificar el tipo de factura")
+            datos_finan = response.data[0]
+            ingresos = float(datos_finan["ingresos_fact"])
+            gastos = float(datos_finan["gastos_fact"])
 
-        nuevo_balance = nuevos_ingresos - nuevos_gastos
+        # Revertir el impacto de la factura anterior si existe
+        if tipo_factura_antiguo:
+            if tipo_factura_antiguo == "Venta":
+                ingresos -= float(total_factura_antiguo)
+            elif tipo_factura_antiguo == "Compra":
+                gastos -= float(total_factura_antiguo)
 
-        ingresar_balance=db.sp_actualizar_balance(id, nuevos_ingresos, nuevos_gastos, nuevo_balance)
+        #  Aplicar el impacto de la nueva factura
+        if tipo_factura == "Venta":
+            ingresos += float(total_monto)
+        elif tipo_factura == "Compra":
+            gastos += float(total_monto)
+        else:
+            raise ValueError("No se puede identificar el tipo de factura")
+
+        #  Calcular el nuevo balance
+        nuevo_balance = ingresos - gastos
+
+        #  Actualizar en la base de datos
+        ingresar_balance = db.sp_actualizar_balance(id, ingresos, gastos, nuevo_balance)
 
         return ingresar_balance
 
     except Exception as e:
-
         return {"success": False, "error": str(e)}
+
 
 
 def serv_actualizar_factura(id_factura, factura:dict ):
 
+    datos_factura_antiguos = obtener_factura_por_id(id_factura)
+
+    datos_dicc = datos_factura_antiguos.data
+
+    datos= datos_dicc[0]
+
+    tipo_factura_antiguo = datos["tipo_de_factura"]
+    total_factura_antiguo =float( datos["total_con_iva"])
+
+    tipo_factura = factura["tipo_de_factura"]
+    total_monto = factura["datos_factura"]["totales"]["total_con_iva"]
+    id_user = factura["id_usuario"]
     response = db.actualizar_factura(id_factura, factura)
+    if response :
+        serv_actualizar_balance(id_user, tipo_factura, total_monto , tipo_factura_antiguo , total_factura_antiguo)
 
     return response
+
+
+def obtener_factura_por_id(id):
+    return  db.sp_obtener_factura_por_id(id)

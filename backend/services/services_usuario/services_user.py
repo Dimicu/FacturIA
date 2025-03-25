@@ -39,3 +39,7 @@ def borrar_usuarios(id: int):
     response_delete = db.supabase.table("users").delete().eq("id", id).execute()
 
     return response_delete.data[0]
+
+def serv_obtener_usuarios_email(email):
+    response = db.obtener_users_id_por_email(email)
+    return response

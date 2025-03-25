@@ -47,7 +47,7 @@ class misfacturasclass:
 
                 with st.spinner("Cargando tus facturas..."):
                     response = requests.get(
-                        f"http://127.0.0.1:8000/facturas/{session_state['email']}"
+                        f"https://facturia-backend-48606537894.us-central1.run.app/facturas/{session_state['email']}"
                     )
                     datos = response.json()
                     st.write(st.session_state["edit_factura"])

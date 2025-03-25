@@ -22,9 +22,7 @@ class SupabaseDB_connection:
         load_dotenv()
         SUPABASE_URL = os.getenv("SUPABASE_URL")
         SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-        SUPABASE_BUCKET_NAME = os.getenv("SUPABASE_BUCKET_NAME")
-        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-        SUPABASE_PROJECT_ID = os.getenv("SUPABASE_PROJECT_ID")
+
 
         if not SUPABASE_URL or not SERVICE_ROLE_KEY:
             raise ValueError(
@@ -63,7 +61,7 @@ class SupabaseDB_connection:
 
     def actualizar_factura(self, id_factura,  updates:dict):
 
-        updates_sanitizado = {key: value for key, value in updates.items() if key != "url"}
+        updates_sanitizado = {key: value for key, value in updates.items() if key not in ["url", "id_usuario"]}
 
         response = self.supabase.table("facturas").update(updates_sanitizado).eq("id_factura", id_factura).execute()
 
@@ -300,4 +298,8 @@ class SupabaseDB_connection:
     def insert_monitoring(self, table: str, data: dict):
 
         response = self.supabase.table(table).insert(data).execute()
+        return response
+
+    def sp_obtener_factura_por_id(self, id):
+        response = self.supabase.table("facturas").select("datos_factura->totales->total_con_iva", "tipo_de_factura").eq("id_factura", id).execute()
         return response
