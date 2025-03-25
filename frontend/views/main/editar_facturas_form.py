@@ -66,6 +66,8 @@ def edit_factura(factura_data):
         return bool(re.match(r"^[A-Z0-9]{8,9}$", nif))
 
     def validar_fecha(fecha):
+        if fecha is None:
+            fecha = " "
         try:
             datetime.strptime(fecha, "%Y-%m-%d")
             return True
