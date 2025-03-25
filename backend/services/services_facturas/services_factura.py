@@ -15,7 +15,6 @@ from backend.model.modelos import Factura
 from backend.all_supabase_db_connections import SupabaseDB_connection
 from fastapi import FastAPI, UploadFile
 from dotenv import load_dotenv
-from backend.modelo_generativo import ModeloGPT
 import json
 import os
 from PIL import Image
@@ -37,7 +36,6 @@ except Exception as e:
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
-modelo = ModeloGPT("GPT-4", "v1.0", openai_api_key)
 db = SupabaseDB_connection()
 app = FastAPI()
 
@@ -185,21 +183,24 @@ def serv_obtener_balance(email):
     except Exception as e:
         raise RuntimeError("Error al obtener balance")  # Relanzamos con un mensaje genérico
 
-def serv_actualizar_balance(id,tipo_factura,total_monto, tipo_factura_antiguo , total_factura_antiguo ):
+def serv_actualizar_balance(id,tipo_factura,total_monto, tipo_factura_antiguo=None, total_factura_antiguo =0 ):
     try:
         response = db.sp_obtener_balance(id)
         if not response.data:
-            raise ValueError("Usuario financiero no encontrado")
-        datos_finan = response.data[0]
+            # Si no hay datos financieros previos, asumimos que ingresos y gastos son 0
+            ingresos = 0
+            gastos = 0
+        else:
+            datos_finan = response.data[0]
+            ingresos = float(datos_finan["ingresos_fact"])
+            gastos = float(datos_finan["gastos_fact"])
 
-        ingresos = float(datos_finan["ingresos_fact"])
-        gastos = float(datos_finan["gastos_fact"])
-
-        #  Revertir el impacto de la factura anterior
-        if tipo_factura_antiguo == "Venta":
-            ingresos -= float(total_factura_antiguo)
-        elif tipo_factura_antiguo == "Compra":
-            gastos -= float(total_factura_antiguo)
+        # Revertir el impacto de la factura anterior si existe
+        if tipo_factura_antiguo:
+            if tipo_factura_antiguo == "Venta":
+                ingresos -= float(total_factura_antiguo)
+            elif tipo_factura_antiguo == "Compra":
+                gastos -= float(total_factura_antiguo)
 
         #  Aplicar el impacto de la nueva factura
         if tipo_factura == "Venta":
