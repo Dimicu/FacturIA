@@ -164,9 +164,8 @@ def edit_factura(factura_data, factura_img, venta_compra):
             tipo_factura = st.text_input("Tipo de Factura*", factura["tipo_factura"])
             numero_factura = st.text_input("Número de Factura*", factura["numero_factura"])
             serie_factura = st.text_input("Serie*", factura["serie"])
-            fecha_expedicion = st.text_input("Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"])
-            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)*",
-                                            factura["fecha_operacion"] if factura["fecha_operacion"] else "")
+            fecha_expedicion = st.text_input("Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"]  if factura["fecha_expedicion"] else "")
+            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)*", factura["fecha_operacion"] if factura["fecha_operacion"] else "")
 
             if st.button("Confirmar datos de la factura"):
                 errores = validar_campos_factura()
@@ -184,8 +183,8 @@ def edit_factura(factura_data, factura_img, venta_compra):
                     factura_data["receptor"]["nombre"] = receptor_nombre
                     factura_data["receptor"]["NIF_CIF"] = receptor_nif
                     factura_data["receptor"]["domicilio"] = receptor_domicilio
-                    # factura_data["totales"]["total_con_iva"] = total_con_IVA
-                    factura_data["totales"]["total_sin_iva"] = total_sin_IVA
+                    factura_data["totales"]["total_con_iva"] = round(total_sin_IVA,2)
+                    # factura_data["totales"]["total_sin_iva"] = total_sin_IVA
 
                     factura_data_json = json.dumps(factura_data)
 
