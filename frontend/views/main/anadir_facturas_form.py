@@ -61,7 +61,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
         if not nuevo_nombre.strip():
             errores.append("El nombre del producto no puede estar vacío.")
 
-        if not cantidad.strip():
+        if not cantidad:
             errores.append("La cantidad no puede estar vacía.")
         else:
             try:

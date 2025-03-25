@@ -22,9 +22,7 @@ class SupabaseDB_connection:
         load_dotenv()
         SUPABASE_URL = os.getenv("SUPABASE_URL")
         SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-        SUPABASE_BUCKET_NAME = os.getenv("SUPABASE_BUCKET_NAME")
-        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-        SUPABASE_PROJECT_ID = os.getenv("SUPABASE_PROJECT_ID")
+
 
         if not SUPABASE_URL or not SERVICE_ROLE_KEY:
             raise ValueError(
