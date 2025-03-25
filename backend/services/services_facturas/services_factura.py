@@ -195,11 +195,12 @@ def serv_actualizar_balance(id,tipo_factura,total_monto, tipo_factura_antiguo=No
             ingresos = float(datos_finan["ingresos_fact"])
             gastos = float(datos_finan["gastos_fact"])
 
-        #  Revertir el impacto de la factura anterior
-        if tipo_factura_antiguo == "Venta":
-            ingresos -= float(total_factura_antiguo)
-        elif tipo_factura_antiguo == "Compra":
-            gastos -= float(total_factura_antiguo)
+        # Revertir el impacto de la factura anterior si existe
+        if tipo_factura_antiguo:
+            if tipo_factura_antiguo == "Venta":
+                ingresos -= float(total_factura_antiguo)
+            elif tipo_factura_antiguo == "Compra":
+                gastos -= float(total_factura_antiguo)
 
         #  Aplicar el impacto de la nueva factura
         if tipo_factura == "Venta":
