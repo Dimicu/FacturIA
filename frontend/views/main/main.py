@@ -2,6 +2,7 @@ import streamlit as st
 from components.inicio.container_mis_facturas import misfacturasclass
 from components.inicio.container_economia import economiaclass
 
+
 # st.set_page_config(page_title="FacturIA", layout="wide")
 page_bg_img = """
 <style>
@@ -25,14 +26,28 @@ page_bg_img = """
 [data-testid="stHeader"] {
     background-color: rgba(0, 0, 0, 0);
 }
-
 [data-testid="stSidebar"] {
     background-color: rgba(0, 0, 0, 0);
 }
+
+.sidebar-profile {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.sidebar-profile img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+}
+
 </style>
 """
 
 st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 economiaclass().render_economia()
 misfacturasclass().misfacturas()

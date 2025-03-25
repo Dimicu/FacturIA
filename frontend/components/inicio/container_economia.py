@@ -65,10 +65,7 @@ class economiaclass:
                     plot_bgcolor="rgba(0, 0, 0, 0)",
                     paper_bgcolor="rgba(0, 0, 0, 0)",
                 )
-                # fig.update_layout(
-                #     config={
-                #         "displayModeBar": True,
-                #     }
-                # )
 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(
+                    fig, config={"displayModeBar": True}, use_container_width=True
+                )

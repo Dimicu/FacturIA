@@ -29,6 +29,9 @@ page_bg_img = """
 [data-testid="stSidebar"] {
     background-color: rgba(0, 0, 0, 0);
 }
+*{
+text-align: center;
+}
 </style>
 """
 
