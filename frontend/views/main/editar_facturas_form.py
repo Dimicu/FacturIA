@@ -240,7 +240,7 @@ def edit_factura(factura_data):
                             imprimir_errores_items_flag = True
                         else:
                             items[selected_index]["descripcion"] = nuevo_nombre
-                            items[selected_index]["cantidad"] = float(cantidad)
+                            items[selected_index]["cantidad"] = cantidad
                             items[selected_index]["precio_unitario"] = round(float(precio_unitario),2)
                             items[selected_index]["tipo_IVA"] = round(float(tipo_iva),2)
                             items[selected_index]["cuota_IVA"] = round(float(cuota_iva),2)
