@@ -97,20 +97,20 @@ def edit_factura(factura_data, factura_img, venta_compra):
             errores.append("La serie de la factura no puede estar vacía.")
         if not validar_fecha(fecha_expedicion):
             errores.append("La fecha de expedición debe tener el formato YYYY-MM-DD.")
-        if not validar_fecha(fecha_operacion):
+        if fecha_operacion and not validar_fecha(fecha_operacion):
             errores.append("La fecha de operación debe tener el formato YYYY-MM-DD.")
 
         return errores
 
     def validar_campos_items(
-        nuevo_nombre, cantidad, precio_unitario
-    ):  # , tipo_iva, cuota_iva):
+        nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva
+    ):
         errores = []
 
         if not nuevo_nombre.strip():
             errores.append("El nombre del producto no puede estar vacío.")
 
-        if not cantidad:
+        if not cantidad.strip():
             errores.append("La cantidad no puede estar vacía.")
         else:
             try:
@@ -120,7 +120,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
             except ValueError:
                 errores.append("La cantidad debe ser un número entero válido.")
 
-        if not precio_unitario:
+        if not precio_unitario.strip():
             errores.append("El precio unitario no puede estar vacío.")
         else:
             try:
@@ -129,26 +129,26 @@ def edit_factura(factura_data, factura_img, venta_compra):
                     errores.append("El precio unitario debe ser un número positivo.")
             except ValueError:
                 errores.append("El precio unitario debe ser un número válido.")
-        #
-        # if not tipo_iva.strip():
-        #     errores.append("El tipo de IVA no puede estar vacío.")
-        # else:
-        #     try:
-        #         tipo_iva_valido = float(tipo_iva)
-        #         if tipo_iva_valido < 0 or tipo_iva_valido > 100:
-        #             errores.append("El tipo de IVA debe estar entre 0 y 100.")
-        #     except ValueError:
-        #         errores.append("El tipo de IVA debe ser un número válido.")
-        #
-        # if not cuota_iva.strip():
-        #     errores.append("La cuota de IVA no puede estar vacía.")
-        # else:
-        #     try:
-        #         cuota_iva_valida = float(cuota_iva)
-        #         if cuota_iva_valida < 0:
-        #             errores.append("La cuota de IVA no puede ser negativa.")
-        #     except ValueError:
-        #         errores.append("La cuota de IVA debe ser un número válido.")
+
+        if not tipo_iva.strip():
+            errores.append("El tipo de IVA no puede estar vacío.")
+        else:
+            try:
+                tipo_iva_valido = float(tipo_iva)
+                if tipo_iva_valido < 0 or tipo_iva_valido > 100:
+                    errores.append("El tipo de IVA debe estar entre 0 y 100.")
+            except ValueError:
+                errores.append("El tipo de IVA debe ser un número válido.")
+
+        if not cuota_iva.strip():
+            errores.append("La cuota de IVA no puede estar vacía.")
+        else:
+            try:
+                cuota_iva_valida = float(cuota_iva)
+                if cuota_iva_valida < 0:
+                    errores.append("La cuota de IVA no puede ser negativa.")
+            except ValueError:
+                errores.append("La cuota de IVA debe ser un número válido.")
 
         return errores
 
@@ -183,15 +183,14 @@ def edit_factura(factura_data, factura_img, venta_compra):
         with image_container:
             st.title("Factura")
             st.image(factura_img, use_container_width=True)
-            # total_con_IVA = calcular_total_con_iva(items)
+            total_con_IVA = calcular_total_con_iva(items)
             total_sin_IVA = calcular_total_sin_iva(items)
             st.subheader("Total de la Factura:")
-            # col1, col22 = st.columns([1, 1], gap="medium")
-            st.write(f"Total: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
-            # with col1:
-            #      st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
-            # with col22:
-            #     st.write(f"Total sin IVA: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
+            col1, col22 = st.columns([1, 1], gap="medium")
+            with col1:
+                st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
+            with col22:
+                st.write(f"Total sin IVA: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
 
     with col2_form:
         datosfactura_container = st.container(border=True)
@@ -225,8 +224,7 @@ def edit_factura(factura_data, factura_img, venta_compra):
             )
             serie_factura = st.text_input("Serie*", factura["serie"])
             fecha_expedicion = st.text_input(
-                "Fecha de Expedición (YYYY-MM-DD)*",
-                factura["fecha_expedicion"] if factura["fecha_expedicion"] else "",
+                "Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"]
             )
             fecha_operacion = st.text_input(
                 "Fecha de Operación (YYYY-MM-DD)*",
@@ -249,8 +247,8 @@ def edit_factura(factura_data, factura_img, venta_compra):
                     factura_data["receptor"]["nombre"] = receptor_nombre
                     factura_data["receptor"]["NIF_CIF"] = receptor_nif
                     factura_data["receptor"]["domicilio"] = receptor_domicilio
-                    factura_data["totales"]["total_con_iva"] = round(total_sin_IVA, 2)
-                    # factura_data["totales"]["total_sin_iva"] = total_sin_IVA
+                    factura_data["totales"]["total_con_iva"] = total_con_IVA
+                    factura_data["totales"]["total_sin_iva"] = total_sin_IVA
 
                     factura_data_json = json.dumps(factura_data)
 
@@ -287,31 +285,29 @@ def edit_factura(factura_data, factura_img, venta_compra):
                 nuevo_nombre = st.text_input(
                     "Nuevo Nombre*", selected_item["descripcion"]
                 )
-                cantidad = st.number_input(
-                    "Cantidad*", min_value=1, value=int(selected_item["cantidad"])
-                )
+                cantidad = st.text_input("Cantidad*", str(selected_item["cantidad"]))
                 precio_unitario = st.text_input(
                     "Precio Unitario*", str(selected_item["precio_unitario"])
                 )
-                # tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
-                # cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
+                tipo_iva = st.text_input("Tipo IVA*", str(selected_item["tipo_IVA"]))
+                cuota_iva = st.text_input("Cuota IVA*", str(selected_item["cuota_IVA"]))
 
                 col1_update, col2_add, col3_delete = st.columns([1, 1, 1], gap="medium")
                 with col1_update:
                     if st.button("Actualizar", use_container_width=True):
                         errores_items = validar_campos_items(
-                            nuevo_nombre, cantidad, precio_unitario
-                        )  # , tipo_iva, cuota_iva)
+                            nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva
+                        )
                         if errores_items:
                             imprimir_errores_items_flag = True
                         else:
                             items[selected_index]["descripcion"] = nuevo_nombre
-                            items[selected_index]["cantidad"] = cantidad
-                            items[selected_index]["precio_unitario"] = round(
-                                float(precio_unitario), 2
+                            items[selected_index]["cantidad"] = float(cantidad)
+                            items[selected_index]["precio_unitario"] = float(
+                                precio_unitario
                             )
-                            # items[selected_index]["tipo_IVA"] = round(float(tipo_iva), 2)
-                            # items[selected_index]["cuota_IVA"] = round(float(cuota_iva), 2)
+                            items[selected_index]["tipo_IVA"] = float(tipo_iva)
+                            items[selected_index]["cuota_IVA"] = float(cuota_iva)
                             st.rerun()
                 with col2_add:
                     if st.button("Añadir", use_container_width=True):

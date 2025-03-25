@@ -90,22 +90,20 @@ def edit_factura(factura_data):
             errores.append("La serie de la factura no puede estar vacía.")
         if not validar_fecha(fecha_expedicion):
             errores.append("La fecha de expedición debe tener el formato YYYY-MM-DD.")
-        if not validar_fecha(fecha_operacion):
+        if fecha_operacion and not validar_fecha(fecha_operacion):
             errores.append("La fecha de operación debe tener el formato YYYY-MM-DD.")
-        if not tipo_factura_seleccionado:
-            errores.append("Debe seleccionar operacion de Venta o Compra")
 
         return errores
 
     def validar_campos_items(
-        nuevo_nombre, cantidad, precio_unitario):#, tipo_iva, cuota_iva
+        nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva
     ):
         errores = []
 
         if not nuevo_nombre.strip():
             errores.append("El nombre del producto no puede estar vacío.")
 
-        if not cantidad:
+        if not cantidad.strip():
             errores.append("La cantidad no puede estar vacía.")
         else:
             try:
@@ -115,7 +113,7 @@ def edit_factura(factura_data):
             except ValueError:
                 errores.append("La cantidad debe ser un número entero válido.")
 
-        if not precio_unitario:
+        if not precio_unitario.strip():
             errores.append("El precio unitario no puede estar vacío.")
         else:
             try:
@@ -124,26 +122,26 @@ def edit_factura(factura_data):
                     errores.append("El precio unitario debe ser un número positivo.")
             except ValueError:
                 errores.append("El precio unitario debe ser un número válido.")
-        #
-        # if not tipo_iva.strip():
-        #     errores.append("El tipo de IVA no puede estar vacío.")
-        # else:
-        #     try:
-        #         tipo_iva_valido = float(tipo_iva)
-        #         if tipo_iva_valido < 0 or tipo_iva_valido > 100:
-        #             errores.append("El tipo de IVA debe estar entre 0 y 100.")
-        #     except ValueError:
-        #         errores.append("El tipo de IVA debe ser un número válido.")
-        #
-        # if not cuota_iva.strip():
-        #     errores.append("La cuota de IVA no puede estar vacía.")
-        # else:
-        #     try:
-        #         cuota_iva_valida = float(cuota_iva)
-        #         if cuota_iva_valida < 0:
-        #             errores.append("La cuota de IVA no puede ser negativa.")
-        #     except ValueError:
-        #         errores.append("La cuota de IVA debe ser un número válido.")
+
+        if not tipo_iva.strip():
+            errores.append("El tipo de IVA no puede estar vacío.")
+        else:
+            try:
+                tipo_iva_valido = float(tipo_iva)
+                if tipo_iva_valido < 0 or tipo_iva_valido > 100:
+                    errores.append("El tipo de IVA debe estar entre 0 y 100.")
+            except ValueError:
+                errores.append("El tipo de IVA debe ser un número válido.")
+
+        if not cuota_iva.strip():
+            errores.append("La cuota de IVA no puede estar vacía.")
+        else:
+            try:
+                cuota_iva_valida = float(cuota_iva)
+                if cuota_iva_valida < 0:
+                    errores.append("La cuota de IVA no puede ser negativa.")
+            except ValueError:
+                errores.append("La cuota de IVA debe ser un número válido.")
 
         return errores
 
@@ -178,7 +176,7 @@ def edit_factura(factura_data):
         with image_container:
             st.title("Factura")
             st.image(factura_data["url"], use_container_width=True)
-            # total_con_IVA = calcular_total_con_iva(items)
+            total_con_IVA = calcular_total_con_iva(items)
             total_sin_IVA = calcular_total_sin_iva(items)
             st.subheader("Total de la Factura:")
             col1, col22 = st.columns([1, 1], gap="medium")
@@ -271,14 +269,17 @@ def edit_factura(factura_data):
                     ] = total_sin_IVA
 
                     factura_data_json = json.dumps(factura_data)
-
+                    # st.write(factura_data)
+                    st.write(factura_data)
+                    # print(factura_data)
                     response = requests.put(
-                        f" https://facturia-backend-48606537894.us-central1.run.app/facturas/actualizacion/{factura_data["id_factura"]}",
+                        f"http://127.0.0.1:8000/facturas/actualizacion/{factura_data["id_factura"]}",
                         data={
                             "id_factura": factura_data["id_factura"],
                             "factura": factura_data_json,
                         },
                     )
+                    # st.write(response.json())
                     if response.status_code == 200:
                         st.session_state["layoutConfig"] = "centered"
                         st.session_state["edit_factura"] = ""

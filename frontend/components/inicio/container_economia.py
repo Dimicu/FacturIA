@@ -34,44 +34,38 @@ class economiaclass:
                 with col3:
                     st.metric(label="Balance", value=f"{balance}€")
 
-                # Mostrar gráfico solo si hay valores significativos
-                if any([ingresos, gastos, balance]):
-                    st.divider()  # Línea separadora opcional
+                # Segunda fila con gráfico Donut
+                st.divider()  # Línea separadora opcional
+                colores = ["#DC3545 ", "#28A745", "#007BFF"]  # Azul, Rojo, Verde
 
-                    colores = [
-                        "#DC3545",
-                        "#28A745",
-                        "#007BFF",
-                    ]  # Rojo, Verde, Azul (sin espacios extra)
+                fig = go.Figure(
+                    data=[
+                        go.Pie(
+                            labels=["Gastos", "Ingresos", "Balance"],
+                            values=[gastos, ingresos, balance],
+                            hole=0.6,  # Tamaño del agujero del donut
+                            marker=dict(
+                                colors=colores, line=dict(color="#FFFFFF", width=2)
+                            ),  # Colores y bordes
+                            hoverinfo="label+value",  # Muestra etiqueta y valor en hover
+                            textinfo="none",
+                        )
+                    ]
+                )
 
-                    fig = go.Figure(
-                        data=[
-                            go.Pie(
-                                labels=["Gastos", "Ingresos", "Balance"],
-                                values=[gastos, ingresos, balance],
-                                hole=0.6,  # Tamaño del agujero del donut
-                                marker=dict(
-                                    colors=colores, line=dict(color="#FFFFFF", width=2)
-                                ),  # Colores y bordes
-                                hoverinfo="label+value",  # Muestra etiqueta y valor en hover
-                                textinfo="none",
-                            )
-                        ]
-                    )
+                # Ajustar diseño del gráfico
+                fig.update_layout(
+                    height=330,
+                    width=330,  # Tamaño del gráfico
+                    margin=dict(l=10, r=10, t=10, b=10),  # Márgenes
+                    showlegend=False,  # Ocultar leyenda
+                    hoverlabel=dict(
+                        font_size=14, font_family="Arial"
+                    ),  # Tamaño de letra en hover
+                    plot_bgcolor="rgba(0, 0, 0, 0)",
+                    paper_bgcolor="rgba(0, 0, 0, 0)",
+                )
 
-                    # Ajustar diseño del gráfico
-                    fig.update_layout(
-                        height=330,
-                        width=330,  # Tamaño del gráfico
-                        margin=dict(l=10, r=10, t=10, b=10),  # Márgenes
-                        showlegend=False,  # Ocultar leyenda
-                        hoverlabel=dict(
-                            font_size=14, font_family="Arial"
-                        ),  # Tamaño de letra en hover
-                    )
-
-                    st.plotly_chart(
-                        fig, config={"displayModeBar": False}, use_container_width=True
-                    )
-                else:
-                    st.info("No hay datos suficientes para generar el gráfico.")
+                st.plotly_chart(
+                    fig, config={"displayModeBar": True}, use_container_width=True
+                )
