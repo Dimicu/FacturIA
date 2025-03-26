@@ -4,6 +4,46 @@ import requests
 import re
 from datetime import datetime
 
+page_bg_img = """
+<style>
+[data-testid="stAppViewContainer"] {
+background-image: url("https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+background-size: cover;
+opacity: 0.9;
+}
+[data-testid="stAppViewContainer"]::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(255, 255, 255, 0.5);
+z-index: -1;
+}
+[data-testid="stHeader"] {
+background-color: rgba(0, 0, 0, 0);
+}
+
+
+[data-testid="stSidebar"] {
+background-color: rgba(0, 0, 0, 0);
+}
+
+
+[data-testid="stVerticalBlockBorderWrapper"] {
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(20px);
+border-radius: 15px;
+border: 1px solid rgba(255, 255, 255, 0.2);
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+
+</style>
+"""
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 def calcular_total_con_iva(items):
     total = 0
     for item in items:
@@ -26,6 +66,8 @@ def edit_factura(factura_data):
         return bool(re.match(r'^[A-Z0-9]{8,9}$', nif))
 
     def validar_fecha(fecha):
+        if fecha is None:
+            fecha = " "
         try:
             datetime.strptime(fecha, "%Y-%m-%d")
             return True
@@ -57,7 +99,7 @@ def edit_factura(factura_data):
 
         return errores
 
-    def validar_campos_items(nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva):
+    def validar_campos_items(nuevo_nombre, cantidad, precio_unitario):#, tipo_iva, cuota_iva):
         errores = []
 
         if not nuevo_nombre.strip():
@@ -73,7 +115,7 @@ def edit_factura(factura_data):
             except ValueError:
                 errores.append("La cantidad debe ser un número entero válido.")
 
-        if not precio_unitario.strip():
+        if not precio_unitario:
             errores.append("El precio unitario no puede estar vacío.")
         else:
             try:
@@ -82,26 +124,26 @@ def edit_factura(factura_data):
                     errores.append("El precio unitario debe ser un número positivo.")
             except ValueError:
                 errores.append("El precio unitario debe ser un número válido.")
-
-        if not tipo_iva.strip():
-            errores.append("El tipo de IVA no puede estar vacío.")
-        else:
-            try:
-                tipo_iva_valido = float(tipo_iva)
-                if tipo_iva_valido < 0 or tipo_iva_valido > 100:
-                    errores.append("El tipo de IVA debe estar entre 0 y 100.")
-            except ValueError:
-                errores.append("El tipo de IVA debe ser un número válido.")
-
-        if not cuota_iva.strip():
-            errores.append("La cuota de IVA no puede estar vacía.")
-        else:
-            try:
-                cuota_iva_valida = float(cuota_iva)
-                if cuota_iva_valida < 0:
-                    errores.append("La cuota de IVA no puede ser negativa.")
-            except ValueError:
-                errores.append("La cuota de IVA debe ser un número válido.")
+        #
+        # if not tipo_iva.strip():
+        #     errores.append("El tipo de IVA no puede estar vacío.")
+        # else:
+        #     try:
+        #         tipo_iva_valido = float(tipo_iva)
+        #         if tipo_iva_valido < 0 or tipo_iva_valido > 100:
+        #             errores.append("El tipo de IVA debe estar entre 0 y 100.")
+        #     except ValueError:
+        #         errores.append("El tipo de IVA debe ser un número válido.")
+        #
+        # if not cuota_iva.strip():
+        #     errores.append("La cuota de IVA no puede estar vacía.")
+        # else:
+        #     try:
+        #         cuota_iva_valida = float(cuota_iva)
+        #         if cuota_iva_valida < 0:
+        #             errores.append("La cuota de IVA no puede ser negativa.")
+        #     except ValueError:
+        #         errores.append("La cuota de IVA debe ser un número válido.")
 
         return errores
 
@@ -141,7 +183,7 @@ def edit_factura(factura_data):
         with image_container:
             st.title("Factura")
             st.image(factura_data["url"], use_container_width=True)
-            total_con_IVA = calcular_total_con_iva(items)
+            # total_con_IVA = calcular_total_con_iva(items)
             total_sin_IVA = calcular_total_sin_iva(items)
             st.subheader("Total de la Factura:")
             col1, col22 = st.columns([1, 1], gap="medium")
@@ -152,11 +194,11 @@ def edit_factura(factura_data):
                 horizontal=True,
                 index=0 if factura_data["tipo_de_factura"] == "Venta" else 1
             )
-
-            with col1:
-                st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
-            with col22:
-                st.write(f"Total sin IVA: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
+            st.write(f"Total: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
+            # with col1:
+            #     st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
+            # with col22:
+            #     st.write(f"Total sin IVA: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
 
     with col2_form:
         datosfactura_container = st.container(border=True)
@@ -177,9 +219,8 @@ def edit_factura(factura_data):
             tipo_factura = st.text_input("Tipo de Factura*", factura["tipo_factura"])
             numero_factura = st.text_input("Número de Factura*", factura["numero_factura"])
             serie_factura = st.text_input("Serie*", factura["serie"])
-            fecha_expedicion = st.text_input("Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"])
-            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)*",
-                                            factura["fecha_operacion"] if factura["fecha_operacion"] else "")
+            fecha_expedicion = st.text_input("Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"]  if factura["fecha_expedicion"] else "")
+            fecha_operacion = st.text_input("Fecha de Operación (YYYY-MM-DD)*", factura["fecha_operacion"] if factura["fecha_operacion"] else "")
 
             if st.button("Confirmar datos de la factura"):
                 errores = validar_campos_factura()
@@ -197,8 +238,8 @@ def edit_factura(factura_data):
                     factura_data["datos_factura"]["receptor"]["nombre"] = receptor_nombre
                     factura_data["datos_factura"]["receptor"]["NIF_CIF"] = receptor_nif
                     factura_data["datos_factura"]["receptor"]["domicilio"] = receptor_domicilio
-                    factura_data["datos_factura"]["totales"]["total_con_iva"] = round(total_con_IVA,2)
-                    factura_data["datos_factura"]["totales"]["total_sin_iva"] = round(total_sin_IVA, 2)
+                    factura_data["datos_factura"]["totales"]["total_con_iva"] = round(total_sin_IVA,2)
+                    # factura_data["datos_factura"]["totales"]["total_sin_iva"] = round(total_sin_IVA, 2)
                     factura_data["tipo_de_factura"] = tipo_factura_seleccionado
                     factura_data["id_usuario"] = id
                     factura_data_json = json.dumps(factura_data)
@@ -227,23 +268,23 @@ def edit_factura(factura_data):
                 selected_item = items[selected_index]
 
                 nuevo_nombre = st.text_input("Nuevo Nombre*", selected_item['descripcion'])
-                cantidad = st.number_input("Cantidad*", int(selected_item['cantidad']))
+                cantidad = st.number_input("Cantidad*", min_value=1, value=int(selected_item['cantidad']))
                 precio_unitario = st.text_input("Precio Unitario*", str(selected_item['precio_unitario']))
-                tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
-                cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
+                # tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
+                # cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
 
                 col1_update, col2_add, col3_delete = st.columns([1, 1, 1], gap="medium")
                 with col1_update:
                     if st.button("Actualizar", use_container_width=True):
-                        errores_items = validar_campos_items(nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva)
+                        errores_items = validar_campos_items(nuevo_nombre, cantidad, precio_unitario)#, tipo_iva, cuota_iva)
                         if errores_items:
                             imprimir_errores_items_flag = True
                         else:
                             items[selected_index]["descripcion"] = nuevo_nombre
                             items[selected_index]["cantidad"] = cantidad
                             items[selected_index]["precio_unitario"] = round(float(precio_unitario),2)
-                            items[selected_index]["tipo_IVA"] = round(float(tipo_iva),2)
-                            items[selected_index]["cuota_IVA"] = round(float(cuota_iva),2)
+                            # items[selected_index]["tipo_IVA"] = round(float(tipo_iva),2)
+                            # items[selected_index]["cuota_IVA"] = round(float(cuota_iva),2)
                             st.rerun()
                 with col2_add:
                     if st.button("Añadir", use_container_width=True):

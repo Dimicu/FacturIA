@@ -4,9 +4,13 @@ import streamlit as st
 import requests
 from streamlit import session_state
 
+
 st.session_state["actualizar_factura"] = ""
 
-def factura_mini_card(id_factura, numero_factura, emisor, receptor, fecha, total, tipo_factura):
+
+def factura_mini_card(
+    id_factura, numero_factura, emisor, receptor, fecha, total, tipo_factura
+):
     """Crea una tarjeta de factura mostrando los datos esenciales, incluyendo si es venta o compra"""
     with st.container():
         col1, col2 = st.columns(2)
@@ -15,14 +19,15 @@ def factura_mini_card(id_factura, numero_factura, emisor, receptor, fecha, total
         with col1:
             st.write(f"**Num. Factura:** {numero_factura}")
             st.write(f"**Cliente/Proveedor:** {nombre}")
-            st.write(f"**Fecha:** {datetime.strptime(fecha, '%Y-%m-%d').strftime('%d/%m/%Y')}")
+            st.write(
+                f"**Fecha:** {datetime.strptime(fecha, '%Y-%m-%d').strftime('%d/%m/%Y')}"
+            )
 
         with col2:
-            st.write(f"**Tipo:** {tipo_factura.capitalize()}")  # Muestra "Venta" o "Compra"
+            st.write(
+                f"**Tipo:** {tipo_factura.capitalize()}"
+            )  # Muestra "Venta" o "Compra"
             st.write(f"**Total:** {total}")
-
-
-
 
 
 class misfacturasclass:
@@ -36,18 +41,24 @@ class misfacturasclass:
                 st.title("Mis facturas")
             with bill_row[0]:
 
-                filtro = st.radio("Filtrar por:", ["Todas", "Venta", "Compra"], horizontal=True)
+                filtro = st.radio(
+                    "Filtrar por:", ["Todas", "Venta", "Compra"], horizontal=True
+                )
 
-                with st.spinner('Cargando tus facturas...'):
-                    response = requests.get(f"https://facturia-backend-48606537894.us-central1.run.app/facturas/{session_state['email']}")
+                with st.spinner("Cargando tus facturas..."):
+                    response = requests.get(
+                        f"https://facturia-backend-48606537894.us-central1.run.app/facturas/{session_state['email']}"
+                    )
                     datos = response.json()
                     st.write(st.session_state["edit_factura"])
 
                     if datos["data"] != []:
                         if "data" in datos:
                             facturas_filtradas = [
-                                factura for factura in datos["data"]
-                                if filtro == "Todas" or factura["tipo_de_factura"].lower() == filtro.lower()
+                                factura
+                                for factura in datos["data"]
+                                if filtro == "Todas"
+                                or factura["tipo_de_factura"].lower() == filtro.lower()
                             ]
 
                             for factura in facturas_filtradas:
@@ -58,18 +69,23 @@ class misfacturasclass:
                                         factura["datos_factura"]["emisor"]["nombre"],
                                         factura["datos_factura"]["receptor"]["nombre"],
                                         factura["datos_factura"]["fecha_expedicion"],
-                                        factura["datos_factura"]["totales"]["total_con_iva"],
-                                        factura["tipo_de_factura"]
+                                        factura["datos_factura"]["totales"][
+                                            "total_con_iva"
+                                        ],
+                                        factura["tipo_de_factura"],
                                     )
-                                    if st.button("Editar", key=f"editar_{factura['id_factura']}"):
+                                    if st.button(
+                                        "Editar", key=f"editar_{factura['id_factura']}"
+                                    ):
                                         st.session_state["layoutConfig"] = "wide"
                                         st.session_state["edit_factura"] = factura
                                         st.rerun()
 
-
-
                         else:
-                            st.error("No se encontraron facturas o hubo un error al cargar los datos.")
+                            st.error(
+                                "No se encontraron facturas o hubo un error al cargar los datos."
+                            )
                     else:
-                        st.write("No hay facturas disponibles, prueba a añadir una mediante ´añadir facturas´")
-
+                        st.write(
+                            "No hay facturas disponibles, prueba a añadir una mediante ´añadir facturas´"
+                        )
