@@ -4,6 +4,8 @@ import requests
 import re
 from datetime import datetime
 
+from numpy.ma.core import min_val
+
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
@@ -268,7 +270,7 @@ def edit_factura(factura_data):
                 selected_item = items[selected_index]
 
                 nuevo_nombre = st.text_input("Nuevo Nombre*", selected_item['descripcion'])
-                cantidad = st.number_input("Cantidad*", min_value=1, value=int(selected_item['cantidad']))
+                cantidad = st.number_input("Cantidad*", min_value=1, value=int(selected_item['cantidad']) if int(selected_item['cantidad']) > 0 else 1)
                 precio_unitario = st.text_input("Precio Unitario*", str(selected_item['precio_unitario']))
                 # tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
                 # cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
