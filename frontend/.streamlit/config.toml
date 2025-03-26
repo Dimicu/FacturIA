@@ -1,8 +1,0 @@
-[theme]
-base = "light"  # O "dark", dependiendo de tu preferencia
-primaryColor = "#7971ea"  # Color llamativo para botones y enlaces
-backgroundColor = "#DFE2FE"  # Fondo principal claro y suave
-secondaryBackgroundColor = "#B1CBFA"  # Fondo para la barra lateral y widgets
-textColor = "#393D3F"  # Gris oscuro para mejorar la legibilidad
-font = "Source Sans Pro"
-
