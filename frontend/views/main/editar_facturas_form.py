@@ -7,34 +7,37 @@ from datetime import datetime
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background-image: url("https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
-    background-size: cover;
-    opacity: 0.9;
+background-image: url("https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+background-size: cover;
+opacity: 0.9;
 }
 [data-testid="stAppViewContainer"]::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.5);
-    z-index: -1;
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(255, 255, 255, 0.5);
+z-index: -1;
 }
 [data-testid="stHeader"] {
-    background-color: rgba(0, 0, 0, 0);
+background-color: rgba(0, 0, 0, 0);
 }
+
 
 [data-testid="stSidebar"] {
-    background-color: rgba(0, 0, 0, 0);
+background-color: rgba(0, 0, 0, 0);
 }
 
+
 [data-testid="stVerticalBlockBorderWrapper"] {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(20px);
+border-radius: 15px;
+border: 1px solid rgba(255, 255, 255, 0.2);
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
 
 </style>
 """
@@ -98,8 +101,8 @@ def edit_factura(factura_data):
         return errores
 
     def validar_campos_items(
-        nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva
-    ):
+        nuevo_nombre, cantidad, precio_unitario
+    ):  # , tipo_iva, cuota_iva):
         errores = []
 
         if not nuevo_nombre.strip():
@@ -166,6 +169,12 @@ def edit_factura(factura_data):
                 st.rerun()
 
     factura = factura_data["datos_factura"]
+    # Tengo el email y necesito el id para actualizar la factura
+    email = st.session_state["email"]
+    id = requests.get(
+        f"https://facturia-backend-48606537894.us-central1.run.app/usuarios/{email}"
+    ).json()
+
     items = factura["items"]
     imprimir_errores_flag = False
     imprimir_errores_items_flag = False
@@ -182,10 +191,18 @@ def edit_factura(factura_data):
             total_sin_IVA = calcular_total_sin_iva(items)
             st.subheader("Total de la Factura:")
             col1, col22 = st.columns([1, 1], gap="medium")
-            with col1:
-                st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
-            with col22:
-                st.write(f"Total sin IVA: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
+            tipo_factura_seleccionado = st.radio(
+                "Elija el tipo de factura",
+                ["Venta", "Compra"],
+                key="tipo_factura",
+                horizontal=True,
+                index=0 if factura_data["tipo_de_factura"] == "Venta" else 1,
+            )
+            st.write(f"Total: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
+            # with col1:
+            #     st.write(f"Total con IVA: €{total_con_IVA:.2f}", unsafe_allow_html=True)
+            # with col22:
+            #     st.write(f"Total sin IVA: €{total_sin_IVA:.2f}", unsafe_allow_html=True)
 
     with col2_form:
         datosfactura_container = st.container(border=True)
@@ -195,12 +212,6 @@ def edit_factura(factura_data):
             st.subheader("Emisor")
             emisor_nombre = st.text_input("Nombre*", factura["emisor"]["nombre"])
             emisor_nif = st.text_input(
-                "NIF/CIF*", factura["emisor"]["NIF_CIF"], max_chars=8
-            )
-            emisor_domicilio = st.text_input(
-                "Domicilio*", factura["emisor"]["domicilio"]
-            )
-            emisor_nif = st.text_input(
                 "NIF/CIF*", factura["emisor"]["NIF_CIF"], max_chars=9
             )
             emisor_domicilio = st.text_input(
@@ -208,15 +219,6 @@ def edit_factura(factura_data):
             )
 
             st.subheader("Receptor")
-            receptor_nombre = st.text_input(
-                "Nombre Cliente", factura["receptor"]["nombre"]
-            )
-            receptor_nif = st.text_input(
-                "NIF/CIF Cliente", factura["receptor"]["NIF_CIF"], max_chars=8
-            )
-            receptor_domicilio = st.text_input(
-                "Domicilio Cliente", factura["receptor"]["domicilio"]
-            )
             receptor_nombre = st.text_input(
                 "Nombre Cliente", factura["receptor"]["nombre"]
             )
@@ -234,7 +236,8 @@ def edit_factura(factura_data):
             )
             serie_factura = st.text_input("Serie*", factura["serie"])
             fecha_expedicion = st.text_input(
-                "Fecha de Expedición (YYYY-MM-DD)*", factura["fecha_expedicion"]
+                "Fecha de Expedición (YYYY-MM-DD)*",
+                factura["fecha_expedicion"] if factura["fecha_expedicion"] else "",
             )
             fecha_operacion = st.text_input(
                 "Fecha de Operación (YYYY-MM-DD)*",
@@ -263,13 +266,12 @@ def edit_factura(factura_data):
                     factura_data["datos_factura"]["receptor"][
                         "domicilio"
                     ] = receptor_domicilio
-                    factura_data["datos_factura"]["totales"][
-                        "total_con_iva"
-                    ] = total_con_IVA
-                    factura_data["datos_factura"]["totales"][
-                        "total_sin_iva"
-                    ] = total_sin_IVA
-
+                    factura_data["datos_factura"]["totales"]["total_con_iva"] = round(
+                        total_sin_IVA, 2
+                    )
+                    # factura_data["datos_factura"]["totales"]["total_sin_iva"] = round(total_sin_IVA, 2)
+                    factura_data["tipo_de_factura"] = tipo_factura_seleccionado
+                    factura_data["id_usuario"] = id
                     factura_data_json = json.dumps(factura_data)
                     # st.write(factura_data)
                     st.write(factura_data)
@@ -304,29 +306,31 @@ def edit_factura(factura_data):
                 nuevo_nombre = st.text_input(
                     "Nuevo Nombre*", selected_item["descripcion"]
                 )
-                cantidad = st.text_input("Cantidad*", str(selected_item["cantidad"]))
+                cantidad = st.number_input(
+                    "Cantidad*", min_value=1, value=int(selected_item["cantidad"])
+                )
                 precio_unitario = st.text_input(
                     "Precio Unitario*", str(selected_item["precio_unitario"])
                 )
-                tipo_iva = st.text_input("Tipo IVA*", str(selected_item["tipo_IVA"]))
-                cuota_iva = st.text_input("Cuota IVA*", str(selected_item["cuota_IVA"]))
+                # tipo_iva = st.text_input("Tipo IVA*", str(selected_item['tipo_IVA']))
+                # cuota_iva = st.text_input("Cuota IVA*", str(selected_item['cuota_IVA']))
 
                 col1_update, col2_add, col3_delete = st.columns([1, 1, 1], gap="medium")
                 with col1_update:
                     if st.button("Actualizar", use_container_width=True):
                         errores_items = validar_campos_items(
-                            nuevo_nombre, cantidad, precio_unitario, tipo_iva, cuota_iva
-                        )
+                            nuevo_nombre, cantidad, precio_unitario
+                        )  # , tipo_iva, cuota_iva)
                         if errores_items:
                             imprimir_errores_items_flag = True
                         else:
                             items[selected_index]["descripcion"] = nuevo_nombre
-                            items[selected_index]["cantidad"] = float(cantidad)
-                            items[selected_index]["precio_unitario"] = float(
-                                precio_unitario
+                            items[selected_index]["cantidad"] = cantidad
+                            items[selected_index]["precio_unitario"] = round(
+                                float(precio_unitario), 2
                             )
-                            items[selected_index]["tipo_IVA"] = float(tipo_iva)
-                            items[selected_index]["cuota_IVA"] = float(cuota_iva)
+                            # items[selected_index]["tipo_IVA"] = round(float(tipo_iva),2)
+                            # items[selected_index]["cuota_IVA"] = round(float(cuota_iva),2)
                             st.rerun()
                 with col2_add:
                     if st.button("Añadir", use_container_width=True):
